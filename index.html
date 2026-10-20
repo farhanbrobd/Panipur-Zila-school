@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>পানিপুর জেলা স্কুল – ফলাফল ব্যবস্থাপনা</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f5fb;--fg:#1c2340;--card:#fff;--bd:#dfe3f0;--pri:#3b4cca;--pri2:#7a3bd1;--mut:#6b7390}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12162b;--fg:#e8ebfa;--card:#1c2140;--bd:#2d345c;--mut:#9aa3c7}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;font-family:'Hind Siliguri','Noto Sans Bengali',Kalpurush,sans-serif;background:var(--bg);color:var(--fg);font-size:15px}
+header{background:linear-gradient(120deg,var(--pri),var(--pri2));color:#fff;padding:18px 16px}header h1{margin:0;font-size:22px}header p{margin:2px 0 0;opacity:.85;font-size:13px}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--bd)}
+nav button{border:1px solid var(--bd);background:var(--bg);color:var(--fg);padding:8px 14px;border-radius:20px;font:inherit;cursor:pointer}nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+main{max-width:1000px;margin:0 auto;padding:14px}.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
+input,select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);max-width:100%;width:100%}
+label{font-size:12px;color:var(--mut);display:block;margin-bottom:3px}.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:6px}
+.btn{background:linear-gradient(120deg,var(--pri),var(--pri2));color:#fff;border:0;border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}.btn.r{background:#c0392b}.btn.s{padding:4px 10px;font-size:13px}
+.sb{border:1px solid var(--bd);border-radius:10px;padding:10px;margin:8px 0}.sb em{color:var(--pri2);font-style:normal}small{color:var(--mut)}
+table{border-collapse:collapse;width:100%}th,td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:left}.scroll{overflow-x:auto}
+.sheet{background:#fff;color:#111;border:2px solid #333;padding:18px;border-radius:6px;max-width:820px;margin:auto;font-size:14px;overflow-x:auto}
+.sheet table{border-collapse:collapse;width:100%;margin:8px 0}.sheet td,.sheet th{border:1px solid #444;padding:4px 6px;text-align:center;color:#111}.sheet td.l{text-align:left}.sheet th{background:#eef0fa}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:8px}.sh .c{text-align:center;flex:1}.sh h2{margin:0;color:#2b3aa8;font-size:24px}
+.mono{width:76px;height:76px;border:1px dashed #888;display:flex;align-items:center;justify-content:center;font-size:11px;color:#888;overflow:hidden}.mono img{max-width:100%;max-height:100%}.ghost{border:0}
+.tt{text-align:center;margin:10px 0;text-decoration:underline}.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px;margin-top:46px;text-align:center}.ln{border-top:1px solid #111;margin-bottom:3px}.sg b{display:block;font-size:13px}.sg small{color:#444}
+.sum{display:flex;flex-wrap:wrap;gap:6px 18px;font-weight:600;margin:8px 0}.pass{color:#1a7f37}.fail{color:#c0392b}
+@media print{header,nav,.card,.np{display:none!important}body{background:#fff}main{padding:0}}
+</style><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script></head><body>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div><h1>🎓 পানিপুর জেলা স্কুল</h1><p>ফলাফল, এডমিট কার্ড ও ট্রান্সক্রিপ্ট ব্যবস্থাপনা</p></div><div><small id="stt" style="color:#fff"></small> <button id="lo" class="btn s" style="display:none;background:#0003" onclick="AUTH.signOut()">লগআউট</button></div></header>
+<nav id="nav"></nav><main id="app"></main>
+<script>
+const D='০১২৩৪৫৬৭৮৯',bn=x=>String(x).replace(/\d/g,d=>D[d]),esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'),$=s=>document.querySelector(s);
+/* ===== Firebase সেটিং: নিচের ঘরগুলো আপনার Firebase কনফিগ দিয়ে বদলান ===== */
+const firebaseConfig={apiKey:"PASTE_API_KEY",authDomain:"PASTE_AUTH_DOMAIN",projectId:"PASTE_PROJECT_ID",storageBucket:"PASTE_STORAGE_BUCKET",messagingSenderId:"PASTE_SENDER_ID",appId:"PASTE_APP_ID"};
+/* ===================================================================== */
+let DB,AUTH,sT,snap={};const stt=t=>{const e=$('#stt');if(e)e.textContent=t};
+let S={students:[],routine:{},cfg:{exam:'বার্ষিক পরীক্ষা ২০২৬',head:'চ্যাকচ্যাকি মহালক্ষ্মী রাকাপাদ',asst:'জাহান আরা বানু',logo:''}};
+function save(){clearTimeout(sT);stt('সংরক্ষণ হচ্ছে…');sT=setTimeout(sync,800)}
+async function sync(){try{const ops=[],up=[],ids=new Set(S.students.map(s=>String(s.id))),C=DB.collection('students');
+ S.students.forEach(s=>{const j=JSON.stringify(s);if(snap[s.id]!==j){ops.push(b=>b.set(C.doc(String(s.id)),s));up.push([s.id,j])}});
+ Object.keys(snap).forEach(id=>{if(id!='_m'&&!ids.has(id)){ops.push(b=>b.delete(C.doc(id)));up.push([id,null])}});
+ const m=JSON.stringify({routine:S.routine,cfg:S.cfg});if(snap._m!==m){ops.push(b=>b.set(DB.collection('meta').doc('main'),{routine:S.routine,cfg:S.cfg}));up.push(['_m',m])}
+ for(let i=0;i<ops.length;i+=400){const b=DB.batch();ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}
+ up.forEach(([k,v])=>{if(v===null)delete snap[k];else snap[k]=v});stt('✔ সংরক্ষিত')}catch(e){stt('⚠ সংরক্ষণ হয়নি: '+e.message)}}
+async function load(){const [m,q]=await Promise.all([DB.collection('meta').doc('main').get(),DB.collection('students').get()]);
+ if(m.exists){const d=m.data();S.routine=d.routine||{};Object.assign(S.cfg,d.cfg||{})}
+ snap={_m:JSON.stringify({routine:S.routine,cfg:S.cfg})};S.students=q.docs.map(d=>d.data());S.students.forEach(s=>snap[s.id]=JSON.stringify(s));render()}
+function login(){AUTH.signInWithEmailAndPassword($('#em').value,$('#pw').value).catch(x=>alert('লগইন হয়নি: '+x.message))}
+function showLogin(){$('#nav').innerHTML='';$('#app').innerHTML='<div class="card" style="max-width:380px;margin:30px auto"><h3>শিক্ষক লগইন</h3><label>ইমেইল</label><input id="em" type="email"><label>পাসওয়ার্ড</label><input id="pw" type="password"><p><button class="btn" onclick="login()">লগইন</button></p></div>'}
+const V={tab:0,cls:'9',sel:null},cur=()=>S.students.find(s=>s.id==V.sel),stl=()=>S.students.filter(s=>s.cls==V.cls).sort((a,b)=>a.roll-b.roll);
+const CL={};for(let i=1;i<=10;i++)CL[i]='শ্রেণি '+bn(i);
+const DIV={sci:'বিজ্ঞান',bus:'ব্যবসায় শিক্ষা',hum:'মানবিক'},RN={'ইসলাম':'ইসলাম শিক্ষা','হিন্দু':'হিন্দুধর্ম শিক্ষা','বৌদ্ধ':'বৌদ্ধধর্ম শিক্ষা','খ্রিষ্টান':'খ্রিষ্টধর্ম শিক্ষা'},OPT={pe:'শারীরিক শিক্ষা ও স্বাস্থ্য',agri:'কৃষি শিক্ষা',home:'গার্হস্থ্য বিজ্ঞান'};
+function opts(o,v){return Object.entries(o).map(([k,l])=>`<option value="${k}"${k==v?' selected':''}>${l}</option>`).join('')}
+/* বিষয় সংজ্ঞা */
+const P=(k,l,m)=>({k,l,m}),sp=(id,n,parts,conv,ct,o)=>{const raw=parts.reduce((a,p)=>a+p.m,0);return Object.assign({id,n,parts,conv,ct,raw,max:conv?conv+ct:raw},o)};
+const W=[P('w','লিখিত',100)],g=(id,n)=>sp(id,n,W,80,20),g2=(id,n)=>sp(id,n,[P('w','লিখিত',50)],40,10);
+const g9=(id,n)=>sp(id,n,[P('c','সৃজনশীল',70),P('m','এমসিকিউ',30)],80,20,{split:1}),p9=(id,n)=>sp(id,n,[P('c','সৃজনশীল',50),P('m','এমসিকিউ',25),P('p','ব্যবহারিক',25)],80,20,{split:1});
+const g8=(id,n)=>sp(id,n,[P('c','সৃজনশীল',70),P('m','এমসিকিউ',30)],80,20),b28=(id,n)=>sp(id,n,[P('c','সৃজনশীল',35),P('m','এমসিকিউ',15)],40,10);
+const op=(id,n,c,h)=>sp(id,n,[P('t','শ্রেণি অভীক্ষা',20),P('cw','শ্রেণির কাজ',c),P('h','বাড়ির কাজ',h)]),t8=(id,n)=>({id,n,parts:[],t8:1,max:100,raw:100}),pr=(s,p)=>(s.pair=p,s);
+function f4o(st){return st.div=='sci'?(st.main3=='hm'?{bio:'জীববিজ্ঞান'}:{hm:'উচ্চতর গণিত',agri:'কৃষি শিক্ষা',home:'গার্হস্থ্য বিজ্ঞান'}):{agri:'কৃষি শিক্ষা',home:'গার্হস্থ্য বিজ্ঞান',econ:'অর্থনীতি'}}
+function subs(c,st){c=+c;const all=!st,rn=RN[(st&&st.rel)||'ইসলাম'],L=[],m=(s,r)=>L.push({s,r:r||'m'});
+ if(c<=2)[t8('bn','বাংলা'),t8('en','ইংরেজি'),t8('ma','গণিত'),t8('ss','প্রাথমিক বিজ্ঞান ও সামাজিক বিজ্ঞান (সমন্বিত)'),t8('rel',rn),t8('ph','শারীরিক ও মানসিক স্বাস্থ্য শিক্ষা'),t8('ar','শিল্পকলা')].forEach(x=>m(x));
+ else if(c<=5){[g('bn','বাংলা'),g('en','ইংরেজি'),g('ma','গণিত'),g('bgs','বাংলাদেশ ও বিশ্বপরিচয়'),g('sci','প্রাথমিক বিজ্ঞান'),g('rel',rn)].forEach(x=>m(x));
+  if(c==3)[g('ph','শারীরিক ও মানসিক স্বাস্থ্য শিক্ষা'),g('ar','শিল্পকলা')].forEach(x=>m(x));
+  if(c==4)[g('gk','সাধারণ জ্ঞান'),g('co','কম্পিউটার'),g('dr','ড্রয়িং')].forEach(x=>m(x))}
+ else if(c<=8){[pr(g8('bn1','বাংলা প্রথম পত্র'),'বাংলা'),pr(b28('bn2','বাংলা দ্বিতীয় পত্র'),'বাংলা'),pr(g('en1','ইংরেজি প্রথম পত্র'),'ইংরেজি'),pr(g2('en2','ইংরেজি দ্বিতীয় পত্র'),'ইংরেজি'),g8('ma','গণিত'),g8('sci','সাধারণ বিজ্ঞান'),g8('bgs','বাংলাদেশ ও বিশ্বপরিচয়'),g8('rel',rn),sp('ict','তথ্য ও যোগাযোগ প্রযুক্তি',[P('m','এমসিকিউ',15),P('w','লিখিত',10),P('p','ব্যবহারিক',25)],40,10)].forEach(x=>m(x));
+  if(all)Object.keys(OPT).forEach(k=>m(op(k,OPT[k],20,10)));else if(OPT[st.opt])m(op(st.opt,OPT[st.opt],20,10))}
+ else{[pr(g9('bn1','বাংলা প্রথম পত্র'),'বাংলা'),pr(g9('bn2','বাংলা দ্বিতীয় পত্র'),'বাংলা'),pr(g('en1','ইংরেজি প্রথম পত্র'),'ইংরেজি'),pr(g('en2','ইংরেজি দ্বিতীয় পত্র'),'ইংরেজি'),g9('ma','সাধারণ গণিত'),g9('rel',rn),sp('ict','তথ্য ও যোগাযোগ প্রযুক্তি',[P('m','এমসিকিউ',25),P('p','ব্যবহারিক',25)],40,10,{split:1})].forEach(x=>m(x));
+  const X={phy:p9('phy','পদার্থবিজ্ঞান'),che:p9('che','রসায়ন'),bio:p9('bio','জীববিজ্ঞান'),hm:p9('hm','উচ্চতর গণিত'),agri:p9('agri','কৃষি শিক্ষা'),home:p9('home','গার্হস্থ্য বিজ্ঞান'),econ:g9('econ','অর্থনীতি'),acc:g9('acc','হিসাববিজ্ঞান'),fin:g9('fin','ফিন্যান্স ও ব্যাংকিং'),ent:g9('ent','ব্যবসায় উদ্যোগ'),civ:g9('civ','পৌরনীতি ও নাগরিকত্ব'),his:g9('his','বাংলাদেশের ইতিহাস ও বিশ্বসভ্যতা'),geo:g9('geo','ভূগোল ও পরিবেশ')};
+  if(all||st.div=='sci')m(g9('bgs','বাংলাদেশ ও বিশ্বপরিচয়'));if(all||st.div!='sci')m(g9('sci','সাধারণ বিজ্ঞান'));
+  if(all)Object.values(X).forEach(x=>m(x));
+  else{const d=st.div,o=f4o(st);let f=st.f4;if(!o[f])f=Object.keys(o)[0];
+   if(d=='sci'){m(X.phy);m(X.che);m(X[st.main3=='hm'?'hm':'bio'])}else(d=='bus'?['acc','fin','ent']:['civ','his','geo']).forEach(k=>m(X[k]));m(X[f],'f')}
+  m(op('car','ক্যারিয়ার শিক্ষা',10,20));m(op('pe','শারীরিক শিক্ষা ও স্বাস্থ্য',10,20))}
+ return L}
+/* হিসাব */
+function sc(s,mk){mk=mk||{};const n=k=>parseFloat(mk[k])||0;let f;
+ if(s.t8)f=[1,2,3,4,5,6,7,8].map(i=>n('a'+i)).sort((x,y)=>y-x).slice(0,5).reduce((x,y)=>x+y,0);
+ else{const r=s.parts.reduce((a,p)=>a+n(p.k),0);f=s.conv?r/s.raw*s.conv+n('ct'):r}
+ let ok=f*3>=s.max-1e-9;if(s.split)s.parts.forEach(p=>{if(n(p.k)*3<p.m-1e-9)ok=false});return{f,ok}}
+const gr=p=>p>=80?['A+',5]:p>=70?['A',4]:p>=60?['A−',3.5]:p>=50?['B',3]:p>=40?['C',2]:p>=33?['D',1]:['F',0],gl=x=>x>=5?'A+':x>=4?'A':x>=3.5?'A−':x>=3?'B':x>=2?'C':x>=1?'D':'F';
+function calc(st){const rows=[],map={};
+ subs(st.cls,st).forEach(({s,r})=>{const x=sc(s,st.marks[s.id]),k=s.pair||s.id;let o=map[k];if(!o){o=map[k]={key:k,n:s.pair||s.n,f:0,max:0,ok:true,r,d:{}};rows.push(o)}o.f+=x.f;o.max+=s.max;o.ok=o.ok&&x.ok;const mk=st.marks[s.id]||{},add=(q,a,b)=>{const d=o.d[q]=o.d[q]||[0,0];d[0]+=a;d[1]+=b};s.parts.forEach(p=>add(p.k=='t'?'ct':/^(cw|h)$/.test(p.k)?'cw':p.k,parseFloat(mk[p.k])||0,p.m));if(s.conv)add('ct',parseFloat(mk.ct)||0,s.ct)});
+ let tot=0,tm=0,gp=0,nm=0,b4=0,fail=false;
+ rows.forEach(o=>{o.f=Math.round(o.f);[o.g,o.gp]=gr(o.f/o.max*100);if(!o.ok){o.g='F';o.gp=0}tot+=o.f;tm+=o.max;if(o.r=='f')b4=Math.max(o.gp-2,0);else{nm++;gp+=o.gp;if(!o.ok)fail=true}});
+ rows.sort((a,b)=>(a.r=='f')-(b.r=='f'));const gpa=fail||!nm?0:Math.min(5,(gp+b4)/nm);return{rows,tot,tm,gpa,pass:!fail}}
+function rk(st){const A=S.students.filter(x=>x.cls==st.cls).map(x=>({id:x.id,c:calc(x)})),m=A.find(a=>a.id==st.id).c;
+ return{rank:1+A.filter(a=>a.c.pass>m.pass||(a.c.pass==m.pass&&a.c.tot>m.tot)).length,n:A.length,hi:k=>Math.max(0,...A.map(a=>{const r=a.c.rows.find(r=>r.key==k);return r?r.f:0}))}}
+/* শিক্ষার্থী ও নম্বর */
+function addSt(){const id=Date.now(),L=stl();S.students.push({id,cls:V.cls,roll:L.length?L[L.length-1].roll+1:1,name:'',father:'',mother:'',rel:'ইসলাম',div:'sci',main3:'bio',f4:'hm',opt:'pe',marks:{},comment:''});V.sel=id;save();render()}
+function delSt(id){if(confirm('এই শিক্ষার্থীকে মুছবেন?')){S.students=S.students.filter(s=>s.id!=id);if(V.sel==id)V.sel=null;save();render()}}
+function upS(k,v,re){const st=cur();st[k]=k=='roll'?+v:v;if(k=='div'){st.f4=v=='sci'?'hm':'agri';st.main3='bio'}if(k=='main3')st.f4=v=='hm'?'bio':'hm';save();if(re)render()}
+function setM(el,id,k,mx){if(+el.value>mx)el.value=mx;const st=cur();(st.marks[id]=st.marks[id]||{})[k]=el.value;save();$('#pv').innerHTML=pvh(st)}
+function pvh(st){const c=calc(st);return `<table><tr><th>বিষয়</th><th>প্রাপ্ত/পূর্ণমান</th><th>গ্রেড</th></tr>${c.rows.map(o=>`<tr><td>${o.n}${o.r=='f'?' (৪র্থ)':''}</td><td>${bn(o.f)}/${bn(o.max)}</td><td>${o.g}</td></tr>`).join('')}</table><p><b>মোট ${bn(c.tot)}/${bn(c.tm)} · জিপিএ ${bn(c.gpa.toFixed(2))} · <span class="${c.pass?'pass':'fail'}">${c.pass?'কৃতকার্য':'অকৃতকার্য'}</span></b></p>`}
+function vStu(){const L=stl(),st=cur();
+ let h=`<div class="card"><div class="g"><div><label>শ্রেণি</label><select onchange="V.cls=this.value;V.sel=null;render()">${opts(CL,V.cls)}</select></div><div><label>&nbsp;</label><button class="btn" onclick="addSt()">+ নতুন শিক্ষার্থী</button></div></div><p><small>এই শ্রেণিতে ${bn(L.length)} জন শিক্ষার্থী</small></p><div class="scroll"><table>${L.map(s=>`<tr><td>${bn(s.roll)}</td><td>${esc(s.name)||'<small>নামহীন</small>'}</td><td><button class="btn s" onclick="V.sel=${s.id};render()">নম্বর/সম্পাদনা</button> <button class="btn s r" onclick="delSt(${s.id})">মুছুন</button></td></tr>`).join('')}</table></div></div>`;
+ if(!st||st.cls!=V.cls)return h;const c=+st.cls,f=(k,l,t)=>`<div><label>${l}</label><input ${t||''} value="${esc(st[k])}" onchange="upS('${k}',this.value,0)"></div>`,se=(k,l,o)=>`<div><label>${l}</label><select onchange="upS('${k}',this.value,1)">${opts(o,st[k])}</select></div>`;
+ h+=`<div class="card"><h3>${esc(st.name)||'নতুন শিক্ষার্থী'}</h3><div class="g">${f('roll','রোল','type=number')}${f('name','নাম')}${f('father','পিতার নাম')}${f('mother','মাতার নাম')}${se('rel','ধর্ম',Object.fromEntries(Object.keys(RN).map(k=>[k,k])))}`;
+ if(c>=9){h+=se('div','বিভাগ',DIV);if(st.div=='sci')h+=se('main3','তৃতীয় মূল বিষয়',{bio:'জীববিজ্ঞান',hm:'উচ্চতর গণিত'});h+=se('f4','চতুর্থ বিষয়',f4o(st))}
+ if(c>=6&&c<=8)h+=se('opt','ঐচ্ছিক বিষয়',OPT);
+ h+=`</div></div><div class="card"><h3>নম্বর এন্ট্রি</h3>`;
+ subs(c,st).forEach(({s,r})=>{const m=st.marks[s.id]||{},inp=(k,l,mx)=>`<div><label>${l} (${bn(mx)})</label><input type="number" min="0" max="${mx}" step="any" value="${m[k]==null?'':m[k]}" oninput="setM(this,'${s.id}','${k}',${mx})"></div>`;
+  const fl=s.t8?[1,2,3,4,5,6,7,8].map(i=>inp('a'+i,'অভীক্ষা '+bn(i),20)).join(''):s.parts.map(p=>inp(p.k,p.l,p.m)).join('')+(s.conv?inp('ct','শ্রেণি অভীক্ষা',s.ct):'');
+  h+=`<div class="sb"><b>${s.n}${r=='f'?' <em>(চতুর্থ বিষয়)</em>':''}</b> <small>পূর্ণমান ${bn(s.max)}${s.t8?' · সেরা ৫টি গণনা':''}</small><div class="g2">${fl}</div></div>`});
+ return h+`<label>শ্রেণি শিক্ষকের মন্তব্য</label><textarea rows="2" onchange="upS('comment',this.value,0)">${esc(st.comment)}</textarea></div><div class="card"><h3>ফলাফল (লাইভ)</h3><div id="pv">${pvh(st)}</div></div>`}
+/* সাধারণ অংশ */
+const picker=()=>`<div class="card g"><div><label>শ্রেণি</label><select onchange="V.cls=this.value;V.sel=null;render()">${opts(CL,V.cls)}</select></div><div><label>রোল নির্বাচন</label><select onchange="V.sel=+this.value;render()"><option value="">— নির্বাচন —</option>${stl().map(s=>`<option value="${s.id}"${s.id==V.sel?' selected':''}>${bn(s.roll)} – ${esc(s.name)||'নামহীন'}</option>`).join('')}</select></div><div><label>&nbsp;</label><button class="btn" onclick="print()">🖨 প্রিন্ট</button></div></div>`;
+const hd=t=>`<div class="sh"><div class="mono">${S.cfg.logo?`<img src="${S.cfg.logo}">`:'মনোগ্রাম'}</div><div class="c"><h2>পানিপুর জেলা স্কুল</h2><div>একটি মনতেশ্বরী শিক্ষা প্রতিষ্ঠান</div><div>হাটকালুপাড়া মহাসড়ক, পানিপুর</div></div><div class="mono ghost"></div></div><h3 class="tt">${t}</h3>`;
+const info=st=>`<table><tr><td>নাম</td><td class="l">${esc(st.name)}</td><td>রোল</td><td>${bn(st.roll)}</td></tr><tr><td>পিতা</td><td class="l">${esc(st.father)}</td><td>শ্রেণি</td><td>${bn(st.cls)}${+st.cls>8?' ('+DIV[st.div]+')':''}</td></tr><tr><td>মাতা</td><td class="l">${esc(st.mother)}</td><td>পরীক্ষা</td><td>${esc(S.cfg.exam)}</td></tr></table>`;
+const sig=a=>`<div class="sg">${a.map(([t,n])=>`<div><div class="ln"></div><b>${t}</b><small>${esc(n||'')}</small></div>`).join('')}</div>`;
+const fd=d=>d?new Date(d).toLocaleDateString('bn-BD',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}):'—';
+const need=()=>picker()+'<div class="card">উপরে থেকে একজন শিক্ষার্থী নির্বাচন করুন।</div>';
+function vAdm(){const st=cur();if(!st||st.cls!=V.cls)return need();
+ return picker()+`<div class="sheet">${hd('প্রবেশপত্র')}${info(st)}<table><tr><th>ক্রম</th><th>বিষয়</th><th>তারিখ</th><th>সময়</th></tr>${subs(st.cls,st).map(({s},i)=>{const r=S.routine[st.cls+'_'+s.id]||{};return `<tr><td>${bn(i+1)}</td><td class="l">${s.n}</td><td>${fd(r.d)}</td><td>${esc(r.t||'')}</td></tr>`}).join('')}</table><p style="font-size:12px">পরীক্ষার হলে এই প্রবেশপত্র সঙ্গে আনা বাধ্যতামূলক।</p>${sig([['পরীক্ষার্থীর স্বাক্ষর'],['প্রধান শিক্ষক',S.cfg.head]])}</div>`}
+function vTr(){const st=cur();if(!st||st.cls!=V.cls)return need();const c=calc(st),R=rk(st);
+ return picker()+`<div class="sheet">${hd('একাডেমিক ট্রান্সক্রিপ্ট – '+esc(S.cfg.exam))}${info(st)}${tbl(c,R,st)}<div class="sum"><span>জিপিএ: ${bn(c.gpa.toFixed(2))}</span><span>ফলাফল: <span class="${c.pass?'pass':'fail'}">${c.pass?'কৃতকার্য':'অকৃতকার্য'}</span></span><span>মেধাক্রম: ${bn(R.rank)} (মোট ${bn(R.n)} জনের মধ্যে)</span></div><div style="border:1px solid #444;padding:8px;min-height:52px"><b>শ্রেণি শিক্ষকের মন্তব্য:</b> ${esc(st.comment)}</div>${sig([['শ্রেণি শিক্ষক'],['সহকারী প্রধান শিক্ষক',S.cfg.asst],['প্রধান শিক্ষক',S.cfg.head],['অভিভাবক']])}</div>`}
+function tbl(c,R,st){const fl=o=>o.n+(o.r=='f'?' (চতুর্থ বিষয়)':'');
+ if(+st.cls<6)return `<table><tr><th>বিষয়</th><th>পূর্ণমান</th><th>প্রাপ্ত নম্বর</th><th>শ্রেণির সর্বোচ্চ</th><th>গ্রেড</th><th>জিপি</th></tr>${c.rows.map(o=>`<tr><td class="l">${fl(o)}</td><td>${bn(o.max)}</td><td>${bn(o.f)}</td><td>${bn(R.hi(o.key))}</td><td>${o.g}</td><td>${bn(o.gp.toFixed(2))}</td></tr>`).join('')}<tr><th>মোট</th><th>${bn(c.tm)}</th><th>${bn(c.tot)}</th><th></th><th>${c.pass?gl(c.gpa):'F'}</th><th>${bn(c.gpa.toFixed(2))}</th></tr></table>`;
+ const N=x=>bn(+x.toFixed(2)),cell=(o,k)=>o.d[k]?`<td>${N(o.d[k][0])}/${N(o.d[k][1])}</td>`:'<td>—</td>';
+ return `<table style="font-size:12px"><tr><th>বিষয়</th><th>সৃজনশীল</th><th>এমসিকিউ</th><th>লিখিত</th><th>ব্যবহারিক</th><th>শ্রেণি অভীক্ষা</th><th>শ্রেণি ও বাড়ির কাজ</th><th>মোট প্রাপ্ত</th><th>পূর্ণমান</th><th>শ্রেণির সর্বোচ্চ</th><th>গ্রেড</th><th>জিপি</th></tr>${c.rows.map(o=>`<tr><td class="l">${fl(o)}</td>${['c','m','w','p','ct','cw'].map(k=>cell(o,k)).join('')}<td>${bn(o.f)}</td><td>${bn(o.max)}</td><td>${bn(R.hi(o.key))}</td><td>${o.g}</td><td>${bn(o.gp.toFixed(2))}</td></tr>`).join('')}<tr><th>মোট</th><th colspan="6"></th><th>${bn(c.tot)}</th><th>${bn(c.tm)}</th><th></th><th>${c.pass?gl(c.gpa):'F'}</th><th>${bn(c.gpa.toFixed(2))}</th></tr></table>`}
+/* রুটিন ও সেটিংস */
+function setR(id,k,v){const key=V.cls+'_'+id;S.routine[key]=S.routine[key]||{};S.routine[key][k]=v;save()}
+function logo(f){if(!f)return;const r=new FileReader();r.onload=e=>{const i=new Image();i.onload=()=>{const k=Math.min(1,200/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);S.cfg.logo=c.toDataURL('image/png');save();render()};i.src=e.target.result};r.readAsDataURL(f)}
+const cf=(k,l)=>`<div><label>${l}</label><input value="${esc(S.cfg[k])}" onchange="S.cfg.${k}=this.value;save()"></div>`;
+function vSet(){return `<div class="card"><h3>সাধারণ সেটিংস</h3><div class="g">${cf('exam','পরীক্ষার নাম')}${cf('head','প্রধান শিক্ষক')}${cf('asst','সহকারী প্রধান শিক্ষক')}<div><label>মনোগ্রাম (ছবি)</label><input type="file" accept="image/*" onchange="logo(this.files[0])"></div></div></div>
+<div class="card"><h3>পরীক্ষার রুটিন</h3><div class="g"><div><label>শ্রেণি</label><select onchange="V.cls=this.value;render()">${opts(CL,V.cls)}</select></div></div><div class="scroll"><table><tr><th>বিষয়</th><th>তারিখ</th><th>সময়</th></tr>${subs(V.cls,null).map(({s})=>{const r=S.routine[V.cls+'_'+s.id]||{};return `<tr><td>${s.n}</td><td><input type="date" value="${r.d||''}" onchange="setR('${s.id}','d',this.value)"></td><td><input value="${esc(r.t)}" placeholder="সকাল ১০:০০" onchange="setR('${s.id}','t',this.value)"></td></tr>`}).join('')}</table></div></div>
+<div class="card"><h3>ব্যাকআপ</h3><p><small>ডাটা এই ব্রাউজারেই জমা থাকে। নিয়মিত ব্যাকআপ কপি করে রাখুন।</small></p><textarea id="bk" rows="4"></textarea><p><button class="btn s" onclick="$('#bk').value=JSON.stringify(S)">ডাটা দেখান</button> <button class="btn s" onclick="try{S=JSON.parse($('#bk').value);save();render();alert('ইম্পোর্ট হয়েছে')}catch(e){alert('ভুল ডাটা')}">ইম্পোর্ট</button></p></div>`}
+function render(){const T=['শিক্ষার্থী ও নম্বর','এডমিট কার্ড','ট্রান্সক্রিপ্ট','রুটিন ও সেটিংস'];$('#nav').innerHTML=T.map((t,i)=>`<button class="${V.tab==i?'on':''}" onclick="V.tab=${i};render()">${t}</button>`).join('');$('#app').innerHTML=[vStu,vAdm,vTr,vSet][V.tab]()}
+firebase.initializeApp(firebaseConfig);DB=firebase.firestore();AUTH=firebase.auth();
+AUTH.onAuthStateChanged(u=>{$('#lo').style.display=u?'':'none';if(u){$('#app').innerHTML='<div class="card">ডাটা লোড হচ্ছে…</div>';load().catch(e=>{$('#app').innerHTML='<div class="card">ডাটা আনা যায়নি: '+esc(e.message)+'</div>'})}else showLogin()});
+</script></body></html>
