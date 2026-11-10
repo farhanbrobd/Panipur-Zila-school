@@ -1,49 +1,13 @@
-# Let's write the complete updated qpaper.js code based on all the requirements and write it to qpaper.js file.
-# Requirements summary:
-# 1. Class 6-8:
-#    - Bangla 1st Paper (100 Marks: Creative 50 [8 questions, answer 5], Descriptive 20 [Anandapath 4 questions, answer 2, (a)=3, (b)=7], MCQ 30 [Story 15, Poem 15]).
-#    - Bangla 2nd Paper (50 Marks: Written 35, MCQ Grammar 15).
-#    - English 1st Paper (100 Marks: Part A Reading 70, Part B Writing 30).
-#    - English 2nd Paper (50 Marks: Part A Grammar 30, Part B Writing 20 - for Class 6, 7, 8 specific grammar topics & composition word limits).
-#    - General Math (100 Marks: Creative 50 [4 sections x 2 = 8 questions, answer 5, min 1 from each], Short Answer 20 [15 questions, answer 10, 2 marks each], MCQ 30).
-#    - ICT Class 6-8: 7 short questions (answer 5, 2x5=10 marks) + 15 MCQ marks.
-# 2. Class 9-10 (SSC 2027):
-#    - Bangla 1st Paper (100 Marks: Creative 50, Descriptive 20 [Novel 2, Drama 2, answer 1 from each, (a)=3, (b)=7], MCQ 30).
-#    - Bangla 2nd Paper (100 Marks: Written 70 [Paragraph 10, Letter 10, Summary 10, Amplification 10, News Report 10, Essay 20], Grammar MCQ 30).
-#    - English 1st Paper (100 Marks: Reading 70, Writing 30).
-#    - English 2nd Paper (100 Marks: Grammar 60, Writing 40).
-#    - General Math (100 Marks: Creative 50, Short Answer 20, MCQ 30).
-#    - Accounting (100 Marks: Creative 40 [7 answer 4, 10 each], Financial Statement 20 [1 answer 1], Short Answer 10 [7 answer 5, 2 each], MCQ 30).
-#    - Shared QBank for Class 9 and 10! (नवम-दशम श्रेणी प्रश्न ব্যাংক একটাই/শেয়ার্ড).
-# 3. Primary Section (Class 3-5):
-#    - Improved Header format, clear Class 3/4/5 labels.
-#    - Matching (বামডান মিলকরণ) column formatting enhanced.
-#    - Primary MCQ: Integrated into main question paper like High School MCQ (no complex stimulus or multiple response, simple MCQ only). When Bengali or subject MCQ option selected, open MCQ boxes.
-#    - Primary draft/footer notes ("দ্রষ্টব্য") formatted strictly according to given format.
-# 4. Interactive Question Bank & Editing:
-#    - Question editing functionality in qpaper.js bank list.
-#    - Text Import feature for S/C (Creative/Short) and Class 9-10 / Primary questions fully functional.
-#    - Image upload / stimulus image support for questions (উদ্দীপকের ছবি / Image upload/display).
-#    - Math question creation: 2 separate textboxes for 2 questions with a small centered "অথবা" in between. Support for multi-line horizontal/vertical addition/subtraction.
-#    - Dropdown choice for items where multiple options exist + 4 or 5 separate text boxes for questions.
-# 5. Print Layout:
-#    - A4 Landscape orientation for creative/exam question printing (`@page { size: A4 landscape; margin: 10mm; }` or `@page { size: legal landscape; }`).
-
-js_content = """/* qpaper.js — প্রশ্নব্যাংক + প্রশ্নপত্র প্রস্তুতকারক (নতুন কারিকুলাম ও এসএসসি ২০২৭) */
+/* qpaper.js — প্রশ্নব্যাংক + প্রশ্নপত্র প্রস্তুতকারক (নতুন কারিকুলাম ও এসএসসি ২০২৭) */
 (()=>{
 const KS=['ক','খ','গ','ঘ'],RM=['i','ii','iii'],AUTO=['i ও ii','ii ও iii','i ও iii','i, ii ও iii'];
 const CODE={bn:101,bn1:101,bn2:102,en:107,en1:107,en2:108,ma:109,ict:154,che:137,hm:126,phy:136,bio:138,bgs:150,sci:127,econ:141,civ:140,his:153,geo:110,acc:146,ent:143,fin:152,agri:134,home:151},RC={'ইসলাম':111,'হিন্দু':112,'বৌদ্ধ':113,'খ্রিষ্টান':114};
 const Z={cls:'9',sub:'',k:'g',mode:'m',P:{},tm:'1',Q:[],pk:{},o:'',cf:{e:'নির্বাচনী পরীক্ষা-২০২৬',s:'২০২৭ শিক্ষাবর্ষের সিলেবাস অনুযায়ী',t:'',m:'',c:'',l:'বিদ্যালয়ের নাম',g:18,na:'',nc:'',n:''},last:null};
 
-// Share QBank for Class 9 and 10
 const getEffectiveCls = (cls) => (cls === '10' ? '9' : cls);
 
 const sl=c=>{
-  const r=[];
-  if(Z.mode==='p'){
-    return psl();
-  }
-  const K=Z.mode=='c'?'c':'m';
+  if(Z.mode==='p') return psl();
   if(c=='6'||c=='7'||c=='8'){
     return [
       ['bn1','বাংলা প্রথম পত্র',100],
@@ -79,13 +43,19 @@ const cd=id=>id.startsWith('rel_')?RC[id.slice(4)]:(CODE[id]||'');
 const F=(s,a=/^(che|sci|bio|phy|agri|home)$/.test(Z.sub))=>{
   if(!s) return '';
   let r=esc(s)
-    .replace(/\\^\\{([^}]*)\\}_\\{([^}]*)\\}/g,'<span class="iso"><sup>$1</sup><sub>$2</sub></span>')
-    .replace(/\\^\\{([^}]*)\\}|\\^(\\S)/g,(m,x,y)=>'<sup>'+(x!=null?x:y).replace(/-/g,'−')+'</sup>')
-    .replace(/_\\{([^}]*)\\}|_([A-Za-z0-9])/g,(m,x,y)=>'<sub>'+(x!=null?x:y)+'</sub>');
-  return a?r.replace(/([A-Za-z)\\]])(\\d+)/g,'$1<sub>$2</sub>'):r;
+    .replace(/\^\{([^}]*)\}_\{([^}]*)\}/g,'<span class="iso"><sup>$1</sup><sub>$2</sub></span>')
+    .replace(/\^\{([^}]*)\}|\^(\S)/g,(m,x,y)=>'<sup>'+(x!=null?x:y).replace(/-/g,'−')+'</sup>')
+    .replace(/_\{([^}]*)\}|_([A-Za-z0-9])/g,(m,x,y)=>'<sub>'+(x!=null?x:y)+'</sub>');
+  return a?r.replace(/([A-Za-z)\]])(\d+)/g,'$1<sub>$2</sub>'):r;
 };
 
-const draw=()=>{if(typeof V!=='undefined' && V.tab==5)$('#app').innerHTML=view()};
+const draw=()=>{
+  if(typeof V !== 'undefined' && V.tab == 5) {
+    const appEl = document.getElementById('app');
+    if(appEl) appEl.innerHTML = view();
+  }
+};
+
 const ML=()=>Z.Q.filter(x=>(Z.mode=='c')==(x.kind=='c'||x.kind=='s'));
 const qn=()=>ML().filter(x=>Z.pk[x.id]).reduce((a,x)=>a+(x.qs?x.qs.length:1),0);
 const CO=()=>Object.fromEntries(Object.entries(typeof CL!=='undefined'?CL:{'3':'তৃতীয় শ্রেণি','4':'চতুর্থ শ্রেণি','5':'পঞ্চম শ্রেণি','6':'ষষ্ঠ শ্রেণি','7':'সপ্তম শ্রেণি','8':'অষ্টম শ্রেণি','9':'নবম শ্রেণি','10':'দশম শ্রেণি'}).filter(([k])=>Z.mode=='p'?+k>=3&&+k<=5:+k>=6));
@@ -94,29 +64,30 @@ const LET=[...'কখগঘঙচছজঝঞটঠডঢণ'];
 async function ld(){
   try{
     const effCls = getEffectiveCls(Z.cls);
-    const q=await DB.collection('qbank').where('cls','==',effCls).where('sub','==',Z.sub).get();
-    Z.Q=q.docs.map(d=>d.data()).sort((a,b)=>a.ts-b.ts);
+    if(typeof DB !== 'undefined') {
+      const q=await DB.collection('qbank').where('cls','==',effCls).where('sub','==',Z.sub).get();
+      Z.Q=q.docs.map(d=>d.data()).sort((a,b)=>a.ts-b.ts);
+    }
   }catch(e){
-    console.warn('কোয়েরি সমস্যা বা অফলাইন মোড:', e.message);
+    console.warn('অফলাইন বা কোয়েরি সমস্যা:', e.message);
   }
   Z.pk={};
   draw();
 }
 
-/* উদ্দীপক ছবি হ্যান্ডলার */
 function handleImgUpload(e, targetId){
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = function(evt){
-    $(`#${targetId}`).value = evt.target.result;
-    const pvw = $(`#${targetId}_img_pvw`);
+    const el = document.getElementById(targetId);
+    if(el) el.value = evt.target.result;
+    const pvw = document.getElementById(`${targetId}_img_pvw`);
     if(pvw) pvw.src = evt.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-/* ইনপুট স্লট */
 const slot=(n,st)=>`<div class="sb"><label>প্রশ্ন ${bn(n)}</label><textarea id="f${n}q" rows="2"></textarea>${st?[1,2,3].map(i=>`<input id="f${n}s${i}" placeholder="${RM[i-1]}. বিবৃতি">`).join(''):''}<div class="g2">${[0,1,2,3].map(i=>`<input id="f${n}o${i}" placeholder="${KS[i]}. অপশন">`).join('')}</div><label>সঠিক উত্তর</label><select id="f${n}a"><option value="-1">—</option>${KS.map((x,i)=>`<option value="${i}">${x}</option>`).join('')}</select></div>`;
 const SRC='<label>উৎস (যেমন: ঢাকা বোর্ড ২০২৫)</label><input id="src"><label>উদ্দীপক ছবি (ঐচ্ছিক)</label><input type="file" accept="image/*" onchange="QP.imgUp(event,\'img_data\')"><input type="hidden" id="img_data"><img id="img_data_img_pvw" style="max-height:80px;display:block;margin:4px 0;">';
 const BTN='<p><button class="btn" onclick="QP.add()">+ ব্যাংকে যোগ করুন</button></p>';
@@ -128,11 +99,11 @@ const fm=()=>{
   return (k=='u'?'<label>উদ্দীপক</label><textarea id="fst" rows="3"></textarea>':'')+(k=='p'?'<small>অপশন ফাঁকা রাখলে "i ও ii…" নিজে বসবে</small>':'')+slot(1,k!='g')+(k=='u'?slot(2,1):'')+SRC+BTN;
 };
 
-const rd=n=>{const v=k=>($('#f'+n+k)||{value:''}).value.trim();return{q:v('q'),st:[1,2,3].map(i=>v('s'+i)).filter(Boolean),o:[0,1,2,3].map(i=>v('o'+i)),a:+($('#f'+n+'a')||{value:-1}).value}};
+const rd=n=>{const v=k=>(document.getElementById('f'+n+k)||{value:''}).value.trim();return{q:v('q'),st:[1,2,3].map(i=>v('s'+i)).filter(Boolean),o:[0,1,2,3].map(i=>v('o'+i)),a:+(document.getElementById('f'+n+'a')||{value:-1}).value}};
 const fx=q=>{if(q.st.length&&!q.o.some(Boolean))q.o=AUTO.slice();return q};
 
 async function addc(){
-  const k=Z.k,v=i=>($('#'+i)||{value:''}).value.trim();
+  const k=Z.k,v=i=>(document.getElementById(i)||{value:''}).value.trim();
   const effCls = getEffectiveCls(Z.cls);
   const it={id:'q'+Date.now(),cls:effCls,sub:Z.sub,kind:k,src:v('src'),img:v('img_data'),ts:Date.now()};
   if(k=='c'){
@@ -143,7 +114,7 @@ async function addc(){
     it.q=v('sq');
     if(!it.q)return alert('প্রশ্ন লিখুন');
   }
-  try{await DB.collection('qbank').doc(it.id).set(it);}catch(e){}
+  try{if(typeof DB!=='undefined') await DB.collection('qbank').doc(it.id).set(it);}catch(e){}
   Z.Q.push(it);
   draw();
 }
@@ -153,16 +124,15 @@ async function add(){
   const k=Z.k,qs=[rd(1)].concat(k=='u'?[rd(2)]:[]).filter(x=>x.q).map(fx);
   if(!qs.length||qs.some(q=>q.o.some(o=>!o)))return alert('প্রশ্ন ও চারটি অপশন লিখুন');
   if(k=='p'&&!qs[0].st.length)return alert('i, ii, iii বিবৃতি লিখুন');
-  const stim=k=='u'?$('#fst').value.trim():'';
+  const stim=(document.getElementById('fst')||{value:''}).value.trim();
   if(k=='u'&&!stim)return alert('উদ্দীপক লিখুন');
   const effCls = getEffectiveCls(Z.cls);
-  const it={id:'q'+Date.now(),cls:effCls,sub:Z.sub,kind:k,stim,qs,src:($('#src')||{value:''}).value.trim(),img:($('#img_data')||{value:''}).value.trim(),ts:Date.now()};
-  try{await DB.collection('qbank').doc(it.id).set(it);}catch(e){}
+  const it={id:'q'+Date.now(),cls:effCls,sub:Z.sub,kind:k,stim,qs,src:(document.getElementById('src')||{value:''}).value.trim(),img:(document.getElementById('img_data')||{value:''}).value.trim(),ts:Date.now()};
+  try{if(typeof DB!=='undefined') await DB.collection('qbank').doc(it.id).set(it);}catch(e){}
   Z.Q.push(it);
   draw();
 }
 
-/* প্রশ্ন এডিট ও আপডেট */
 function editQ(id){
   const it = Z.Q.find(x=>x.id==id);
   if(!it) return;
@@ -171,7 +141,7 @@ function editQ(id){
     if(it.stim) it.stim = newText;
     else if(it.q) it.q = newText;
     else if(it.qs && it.qs[0]) it.qs[0].q = newText;
-    try{ DB.collection('qbank').doc(id).update(it); }catch(e){}
+    try{ if(typeof DB!=='undefined') DB.collection('qbank').doc(id).update(it); }catch(e){}
     draw();
   }
 }
@@ -180,50 +150,54 @@ const an=async(id,j,v)=>{
   const it=Z.Q.find(x=>x.id==id);
   if(it && it.qs && it.qs[j]){
     it.qs[j].a=+v;
-    try{await DB.collection('qbank').doc(id).update({qs:it.qs})}catch(e){}
+    try{if(typeof DB!=='undefined') await DB.collection('qbank').doc(id).update({qs:it.qs})}catch(e){}
   }
 };
 
 const del=async id=>{
   if(!confirm('এই প্রশ্ন মুছবেন?'))return;
-  try{await DB.collection('qbank').doc(id).delete();}catch(e){}
+  try{if(typeof DB!=='undefined') await DB.collection('qbank').doc(id).delete();}catch(e){}
   Z.Q=Z.Q.filter(x=>x.id!=id);
   draw();
 };
 
-const pk=(id,v)=>{Z.pk[id]=v;if($('#pc')) $('#pc').textContent=bn(qn())};
+const pk=(id,v)=>{
+  Z.pk[id]=v;
+  const pcEl = document.getElementById('pc');
+  if(pcEl) pcEl.textContent=bn(qn());
+};
 
-/* টেক্সট ইম্পোর্ট (সহজ ফরম্যাট) */
 function parse(t){
-  const L=t.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean),R=[];
+  const L=t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),R=[];
   let G=null,need=0,exp=0,q=null,m;
   for(const l of L){
-    if(/উদ্দীপক/.test(l)&&/উত্তর দাও\\s*[:：]?$/.test(l)){need=(l.match(/[০-৯]+/g)||[]).length>1?2:1;exp=1;continue}
+    if(/উদ্দীপক/.test(l)&&/উত্তর দাও\s*[:：]?$/.test(l)){need=(l.match(/[০-৯]+/g)||[]).length>1?2:1;exp=1;continue}
     if(exp){G={kind:'u',stim:l,qs:[]};R.push(G);exp=0;continue}
-    if(m=l.match(/^[০-৯0-9]+\\s*[।.]\\s*(.+)/)){q={q:m[1],st:[],o:[],a:-1};if(G){G.qs.push(q);if(G.qs.length>=need)G=null}else R.push({kind:'g',stim:'',qs:[q]});continue}
+    if(m=l.match(/^[০-৯0-9]+\s*[।.]\s*(.+)/)){q={q:m[1],st:[],o:[],a:-1};if(G){G.qs.push(q);if(G.qs.length>=need)G=null}else R.push({kind:'g',stim:'',qs:[q]});continue}
     if(!q)continue;
-    if(/^i{1,3}\\.\\s/.test(l))q.st.push(...l.split(/\\s+(?=i{1,3}\\.\\s)/).map(x=>x.replace(/^i{1,3}\\.\\s*/,'')));
-    else if(/^ক[.)]\\s/.test(l))q.o=l.split(/\\s+(?=[কখগঘ]\\.\\s)/).map(x=>x.replace(/^[কখগঘ][.)]\\s*/,''));
+    if(/^i{1,3}\.\s/.test(l))q.st.push(...l.split(/\s+(?=i{1,3}\.\s)/).map(x=>x.replace(/^i{1,3}\.\s*/,'')));
+    else if(/^ক[.)]\s/.test(l))q.o=l.split(/\s+(?=[কখগঘ]\.\s)/).map(x=>x.replace(/^[কখগঘ][.)]\s*/,''));
     else if(!/^নিচের কোনটি সঠিক/.test(l))q.q+=' '+l;
   }
   return R.filter(x=>x.qs.length&&x.qs.every(q=>{if(q.st.length&&!q.o.length)q.o=AUTO.slice();return q.o.length==4})).map(x=>{if(x.kind=='g'&&x.qs[0].st.length)x.kind='p';return x});
 }
 
 async function imp(){
-  const its=parse($('#imt').value),src=$('#imsrc').value.trim()||'ইম্পোর্ট';
+  const imtEl = document.getElementById('imt');
+  if(!imtEl) return;
+  const its=parse(imtEl.value),src=(document.getElementById('imsrc')||{value:''}).value.trim()||'ইম্পোর্ট';
   if(!its.length)return alert('কোনো প্রশ্ন পড়া যায়নি। সঠিক ফরম্যাটে লিখুন।');
   const effCls = getEffectiveCls(Z.cls);
   const T=Date.now();
   its.forEach((x,i)=>{
     Object.assign(x,{id:'q'+T+i,cls:effCls,sub:Z.sub,src,ts:T+i});
-    try{ DB.collection('qbank').doc(x.id).set(x); }catch(e){}
+    try{ if(typeof DB!=='undefined') DB.collection('qbank').doc(x.id).set(x); }catch(e){}
     Z.Q.push(x);
   });
   alert(bn(its.length)+'টি প্রশ্ন যোগ হয়েছে!');
   draw();
 }
 
-/* ৪ সেট এমসিকিউ জেনারেটর */
 const rng=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296},sh=(a,r)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const mk4=(si,it)=>{const r=rng(9001+si*7919);return(si?sh(it,r):it).map(x=>({...x,qs:x.qs.map(q=>{if(!si||q.st.length||/সবগুলো|উপরের|কোনোটিই/.test(q.o.join()))return q;const ix=sh([0,1,2,3],r);return{...q,o:ix.map(i=>q.o[i]),a:q.a<0?-1:ix.indexOf(q.a)}})}))};
 
@@ -251,10 +225,11 @@ function gen(){
   if(!it.length)return alert('প্রশ্ন বাছাই করুন');
   const c=Z.cf,MK=(sl(Z.cls).find(a=>a[0]==Z.sub)||[0,0,qn()])[2],x={...c,m:c.m||MK,t:c.t||bn(MK)+' মিনিট',c:c.c||cd(Z.sub),sub:(sl(Z.cls).find(a=>a[0]==Z.sub)||['',''])[1]},K=[];let h='';
   [0,1,2,3].forEach(si=>{const ky=[];h+=sheet(si,mk4(si,it),x,ky);K.push(ky)});
-  Z.o=h+keyh(K);$('#qo').innerHTML=Z.o;
+  Z.o=h+keyh(K);
+  const qoEl = document.getElementById('qo');
+  if(qoEl) qoEl.innerHTML=Z.o;
 }
 
-/* সূত্রের বোতাম */
 const TB=[['নিচে ₂','_{}'],['উপরে ²','^{}'],['⁵⁶₂₆','^{}_{}'],['⁺','^{+}'],['⁻','^{-}'],['²⁺','^{2+}'],['²⁻','^{2-}'],['³⁺','^{3+}'],['³⁻','^{3-}'],['→','→'],['⇌','⇌'],['Δ','Δ'],['°','°'],['↑','↑'],['↓','↓'],['×','×'],['−','−']].map(([l,t])=>`<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.ins('${t}')">${l}</button>`).join('');
 
 const ins=t=>{
@@ -268,7 +243,7 @@ const ins=t=>{
 };
 
 document.addEventListener('focusin',e=>{if(e.target.closest&&e.target.closest('#fm'))Z.last=e.target});
-document.addEventListener('input',e=>{const t=e.target;if(t.closest&&t.closest('#fm')){Z.last=t;const p=$('#pvw');if(p)p.innerHTML=F(t.value)}});
+document.addEventListener('input',e=>{const t=e.target;if(t.closest&&t.closest('#fm')){Z.last=t;const p=document.getElementById('pvw');if(p)p.innerHTML=F(t.value)}});
 
 const ci=(k,l)=>`<div><label>${l}</label><input value="${esc(Z.cf[k])}" oninput="QP.cf.${k}=this.value"></div>`;
 
@@ -289,15 +264,15 @@ function genc(){
     h+=`<div class="ct"><b>সৃজনশীল প্রশ্ন</b><br>(যে কোনো ${bn(nc)}টি প্রশ্নের উত্তর দাও)<br>মান—১০×${bn(nc)}=${bn(nc*10)}</div>`;
     C.forEach(q=>{
       n++;
-      h+=`<div class="cq"><b>${bn(n)}।</b> ${q.img?`<br><img src="${q.img}" style="max-height:160px;margin:6px 0;"><br>`:''}${F(q.stim).replace(/\\n/g,'<br>')}${q.parts.map((p,i)=>`<div class="pr"><span>(${KS[i]}) ${F(p)}</span><b>${bn(i+1)}</b></div>`).join('')}</div>`;
+      h+=`<div class="cq"><b>${bn(n)}।</b> ${q.img?`<br><img src="${q.img}" style="max-height:160px;margin:6px 0;"><br>`:''}${F(q.stim).replace(/\n/g,'<br>')}${q.parts.map((p,i)=>`<div class="pr"><span>(${KS[i]}) ${F(p)}</span><b>${bn(i+1)}</b></div>`).join('')}</div>`;
     });
   }
   const nt=c.n||`ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ${S_.length?'সংক্ষিপ্ত উত্তর প্রশ্ন থেকে যে কোনো '+bn(na)+'টি এবং ':''}সৃজনশীল প্রশ্ন থেকে যে কোনো ${bn(nc)}টি প্রশ্নের উত্তর দিতে হবে।`;
   Z.o=`<div class="qs pb" style="--g:${+c.g||18}px">${hd(x,sub+' (সৃজনশীল)')}<hr><p class="qn">[দ্রষ্টব্য: ${F(nt)}]</p><div class="pr" style="font-weight:700"><span></span><span>নম্বর</span></div>${h}</div>`;
-  $('#qo').innerHTML=Z.o;
+  const qoEl = document.getElementById('qo');
+  if(qoEl) qoEl.innerHTML=Z.o;
 }
 
-/* প্রাথমিক সেকশন (শ্রেণি ৩-৫) */
 const en=t=>String(t).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)),tot=S=>S.reduce((a,x)=>a+(x.p?0:(+en(String(x.m).split('=').pop())||0)),0),nums=S=>{let n=0;return S.map(x=>x.p?'':++n)},tt=S=>{const T=tot(S);return 'মোট '+bn(T)+(T!=100?' <b style="color:#c0392b"> (মোট নম্বর: '+bn(T)+')</b>':'')};
 
 const TPL_PRI={
@@ -388,10 +363,10 @@ function viewp(){
 function genp(){
   const S=PS(),c=Z.cf,N=nums(S),sn=(psl().find(a=>a[0]==Z.sub)||['',''])[1],
   x={...c,l:c.s||'প্রাথমিক বিদ্যালয়',sub:sn,m:c.m||tot(S),nb:1,t:c.t||'২ ঘণ্টা ৩০ মিনিট'},
-  h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\\n/g,'<br>')}</div></div>`:`
+  h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\n/g,'<br>')}</div></div>`:`
     <div class="pr"><span><b>${bn(N[i])}।</b> ${F(q.t)}</span><b>${esc(q.m)}</b></div>
     <div class="sx" style="margin-left:20px;">
-      ${F(q.x).split('\\n').map(line=>line.trim()==='অথবা'?`<div style="text-align:center;font-weight:bold;margin:6px 0;">অথবা</div>`:`<div>${line}</div>`).join('')}
+      ${F(q.x).split('\n').map(line=>line.trim()==='অথবা'?`<div style="text-align:center;font-weight:bold;margin:6px 0;">অথবা</div>`:`<div>${line}</div>`).join('')}
     </div>
   `).join('');
 
@@ -409,7 +384,8 @@ function genp(){
     <p class="qn" style="font-weight:bold;">[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দিতে হবে।]</p>
     ${h}
   </div>`;
-  $('#qo').innerHTML=Z.o;
+  const qoEl = document.getElementById('qo');
+  if(qoEl) qoEl.innerHTML=Z.o;
 }
 
 function view(){
@@ -465,7 +441,6 @@ function view(){
   <div id="qo">${Z.o}</div>`;
 }
 
-/* সিএসএস ও ল্যান্ডস্কেপ প্রিন্ট মিডিয়া */
 const css=document.createElement('style');
 css.textContent=`@font-face{font-family:NikoshBAN;src:local('NikoshBAN'),local('Nikosh'),url('NikoshBAN.ttf')}
 .qs{background:#fff;color:#111;font-family:NikoshBAN,'Noto Serif Bengali',serif;font-size:13px;line-height:1.5;padding:14px;max-width:900px;margin:0 auto 16px;border:1px solid #bbb;overflow-x:auto}
@@ -482,27 +457,49 @@ css.textContent=`@font-face{font-family:NikoshBAN;src:local('NikoshBAN'),local('
 }`;
 document.head.appendChild(css);
 
-const R0=typeof window.render==='function'?window.render:()=>{};
-window.render=function(){
-  const on=typeof V!=='undefined' && V.tab==5;
-  if(on)V.tab=0;
-  R0();
-  if(on)V.tab=5;
-  const nv=$('#nav');
-  if(nv && on){
-    nv.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
-    nv.insertAdjacentHTML('beforeend',`<button class="${on?'on':''}" onclick="V.tab=5;render()">প্রশ্নপত্র</button>`);
+// অটোমেটিক নেভিগেশন ট্যাব ইনজেকশন
+function setupNavTab(){
+  const nav = document.getElementById('nav') || document.querySelector('nav') || document.querySelector('.nav');
+  if(nav && !document.getElementById('btn-qpaper-tab')){
+    const btn = document.createElement('button');
+    btn.id = 'btn-qpaper-tab';
+    btn.className = (typeof V !== 'undefined' && V.tab == 5) ? 'on' : '';
+    btn.textContent = 'প্রশ্নপত্র';
+    btn.onclick = function(){
+      if(typeof V !== 'undefined') V.tab = 5;
+      if(typeof render === 'function') render();
+      else {
+        const app = document.getElementById('app');
+        if(app) app.innerHTML = view();
+      }
+    };
+    nav.appendChild(btn);
   }
-  if(on){
-    if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld()}
-    $('#app').innerHTML=view();
+}
+
+// রেন্ডার ফাংশন ও হুক
+const R0 = typeof window.render === 'function' ? window.render : null;
+window.render = function(){
+  if(R0) R0();
+  setupNavTab();
+  if(typeof V !== 'undefined' && V.tab == 5){
+    const app = document.getElementById('app');
+    if(app){
+      if(!Z.sub){ Z.sub = sl(Z.cls)[0][0]; ld(); }
+      app.innerHTML = view();
+    }
   }
 };
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  setupNavTab();
+  if(typeof V !== 'undefined' && V.tab == 5) window.render();
+});
 
 window.QP={
   md:v=>{Z.mode=v;Z.Q=[];Z.pk={};Z.o='';if(v=='p'){if(+Z.cls<3||+Z.cls>5)Z.cls='3';Z.sub='bn';draw();return}if(+Z.cls<6)Z.cls='9';Z.sub=sl(Z.cls)[0][0];Z.k=v=='c'?'c':'g';draw();ld()},
   tm:v=>{Z.tm=v;draw()},
-  ps:(i,k,v)=>{PS()[i][k]=v;if(k=='m'){const e=$('#tot');if(e)e.innerHTML=tt(PS())}},
+  ps:(i,k,v)=>{PS()[i][k]=v;if(k=='m'){const e=document.getElementById('tot');if(e)e.innerHTML=tt(PS())}},
   cf:Z.cf,
   ins,
   add,
@@ -515,21 +512,8 @@ window.QP={
   imgUp: handleImgUpload,
   cl:v=>{Z.cls=v;if(Z.mode=='p'){Z.sub='bn';draw();return}Z.sub=sl(v)[0][0];Z.Q=[];draw();ld()},
   sb:v=>{Z.sub=v;if(Z.mode=='p'){draw();return}Z.Q=[];draw();ld()},
-  kd:v=>{Z.k=v;$('#fm').innerHTML=fm()},
+  kd:v=>{Z.k=v;const fmEl=document.getElementById('fm');if(fmEl)fmEl.innerHTML=fm()},
   pkey:()=>{document.body.classList.add('pk');print()},
   _t:{parse,mk4,F}
 };
-})();
-"""
-
-with open('qpaper.js', 'w', encoding='utf-8') as f:
-    f.write(js_content)
-
-print("FILE_UPDATED_SUCCESSFULLY")setupNavTab, 100);
-} else {
-  document.addEventListener('DOMContentLoaded', setupNavTab);
-}
-
-window.onafterprint=()=>document.body.classList.remove('pk');
-window.QP={md:v=>{Z.mode=v;Z.Q=[];Z.pk={};Z.o='';if(v=='p'){if(+Z.cls<3||+Z.cls>5)Z.cls='3';Z.sub='bn';draw();return}if(+Z.cls<6)Z.cls='9';Z.sub=sl(Z.cls)[0][0];Z.k=v=='c'?'c':'g';draw();ld()},tm:v=>{Z.tm=v;draw()},ps:(i,k,v)=>{PS()[i][k]=v;if(k=='m'){const e=$('#tot');if(e)e.innerHTML=tt(PS())}},cf:Z.cf,ins,add,an,del,pk,imp,gen,cl:v=>{Z.cls=v;if(Z.mode=='p'){Z.sub='bn';draw();return}Z.sub=sl(v)[0][0];Z.Q=[];draw();ld()},sb:v=>{Z.sub=v;if(Z.mode=='p'){draw();return}Z.Q=[];draw();ld()},kd:v=>{Z.k=v;const fmE=$('#fm');if(fmE)fmE.innerHTML=fm()},pkey:()=>{document.body.classList.add('pk');print()},_t:{parse,mk4,F}};
 })();
