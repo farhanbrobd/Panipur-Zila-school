@@ -1,25 +1,10 @@
-/* qpaper.js — প্রশ্নব্যাংক + এমসিকিউ প্রশ্নপত্র (৪ সেট, এসএসসি ও প্রাথমিক ফরম্যাট). index.html-এর </body>-এর আগে যুক্ত করুন */
+js_code = """/* qpaper.js — প্রশ্নব্যাংক + এমসিকিউ প্রশ্নপত্র (৪ সেট, এসএসসি ফরম্যাট). index.html-এর </body>-এর আগে যুক্ত করুন */
 (()=>{
 const KS=['ক','খ','গ','ঘ'],RM=['i','ii','iii'],AUTO=['i ও ii','ii ও iii','i ও iii','i, ii ও iii'];
 const CODE={bn:101,bn1:101,bn2:102,en:107,en1:107,en2:108,ma:109,ict:154,che:137,hm:126,phy:136,bio:138,bgs:150,sci:127,econ:141,civ:140,his:153,geo:110,acc:146,ent:143,fin:152,agri:134,home:151},RC={'ইসলাম':111,'হিন্দু':112,'বৌদ্ধ':113,'খ্রিষ্টান':114};
 const Z={cls:'9',sub:'',k:'g',mode:'m',P:{},tm:'1',Q:[],pk:{},o:'',cf:{e:'নির্বাচনী পরীক্ষা-২০২৬',s:'২০২৭ শিক্ষাবর্ষের সিলেবাস অনুযায়ী',t:'',m:'',c:'',l:'পানিপুর জেলা স্কুল',g:18,na:'',nc:'',n:''}};
-
-const DEFAULT_SUBS={
-  '6':[['bn1','বাংলা প্রথম পত্র',100],['bn2','বাংলা দ্বিতীয় পত্র',50],['en1','ইংরেজি প্রথম পত্র',100],['en2','ইংরেজি দ্বিতীয় পত্র',50],['ma','সাধারণ গণিত',100],['ict','তথ্য ও যোগাযোগ প্রযুক্তি',50],['sci','বিজ্ঞান',100],['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100]],
-  '7':[['bn1','বাংলা প্রথম পত্র',100],['bn2','বাংলা দ্বিতীয় পত্র',50],['en1','ইংরেজি প্রথম পত্র',100],['en2','ইংরেজি দ্বিতীয় পত্র',50],['ma','সাধারণ গণিত',100],['ict','তথ্য ও যোগাযোগ প্রযুক্তি',50],['sci','বিজ্ঞান',100],['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100]],
-  '8':[['bn1','বাংলা প্রথম পত্র',100],['bn2','বাংলা দ্বিতীয় পত্র',50],['en1','ইংরেজি প্রথম পত্র',100],['en2','ইংরেজি দ্বিতীয় পত্র',50],['ma','সাধারণ গণিত',100],['ict','তথ্য ও যোগাযোগ প্রযুক্তি',50],['sci','বিজ্ঞান',100],['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100]],
-  '9':[['bn1','বাংলা প্রথম পত্র',100],['bn2','বাংলা দ্বিতীয় পত্র',100],['en1','ইংরেজি প্রথম পত্র',100],['en2','ইংরেজি দ্বিতীয় পত্র',100],['ma','সাধারণ গণিত',100],['acc','হিসাববিজ্ঞান',100],['phy','পদার্থবিজ্ঞান',100],['che','রসায়ন',100],['bio','জীববিজ্ঞান',100],['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100]],
-  '10':[['bn1','বাংলা প্রথম পত্র',100],['bn2','বাংলা দ্বিতীয় পত্র',100],['en1','ইংরেজি প্রথম পত্র',100],['en2','ইংরেজি দ্বিতীয় পত্র',100],['ma','সাধারণ গণিত',100],['acc','হিসাববিজ্ঞান',100],['phy','পদার্থবিজ্ঞান',100],['che','রসায়ন',100],['bio','জীববিজ্ঞান',100],['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100]]
-};
-
-const sl=c=>{const r=[];
- try{if(typeof subs==='function'){subs(c,null).forEach(({s})=>{const p=(s.parts||[]).find(p=>p.k==(Z.mode=='c'?'c':'m'));if(p)s.id=='rel'?Object.keys(RN).forEach(k=>r.push(['rel_'+k,RN[k],p.m])):r.push([s.id,s.n,p.m])})}}catch(e){}
- let def=DEFAULT_SUBS[c]||[];
- def.forEach(item=>{if(!r.some(x=>x[0]==item[0]))r.push([item[0],item[1],item[2]])});
- return r;
-},cd=id=>id.startsWith('rel_')?RC[id.slice(4)]:(CODE[id]||'');
-
-const F=(s,a=/^(che|sci|bio|phy|agri|home)$/.test(Z.sub))=>{let r=esc(s).replace(/\^\{([^}]*)\}_\{([^}]*)\}/g,'<span class="iso"><sup>$1</sup><sub>$2</sub></span>').replace(/\^\{([^}]*)\}|\^(\S)/g,(m,x,y)=>'<sup>'+(x!=null?x:y).replace(/-/g,'−')+'</sup>').replace(/_\{([^}]*)\}|_([A-Za-z0-9])/g,(m,x,y)=>'<sub>'+(x!=null?x:y)+'</sub>');return a?r.replace(/([A-Za-z)\]])(\d+)/g,'$1<sub>$2</sub>'):r};
+const sl=c=>{const r=[],K=Z.mode=='c'?'c':'m';subs(c,null).forEach(({s})=>{const p=(s.parts||[]).find(p=>p.k==K);if(p)s.id=='rel'?Object.keys(RN).forEach(k=>r.push(['rel_'+k,RN[k],p.m])):r.push([s.id,s.n,p.m])});return r},cd=id=>id.startsWith('rel_')?RC[id.slice(4)]:(CODE[id]||'');
+const F=(s,a=/^(che|sci|bio|phy|agri|home)$/.test(Z.sub))=>{let r=esc(s).replace(/\\^\\{([^}]*)\\}_\\{([^}]*)\\}/g,'<span class="iso"><sup>$1</sup><sub>$2</sub></span>').replace(/\\^\\{([^}]*)\\}|\\^(\\S)/g,(m,x,y)=>'<sup>'+(x!=null?x:y).replace(/-/g,'−')+'</sup>').replace(/_\\{([^}]*)\\}|_([A-Za-z0-9])/g,(m,x,y)=>'<sub>'+(x!=null?x:y)+'</sub>');return a?r.replace(/([A-Za-z)\\]])(\\d+)/g,'$1<sub>$2</sub>'):r};
 const draw=()=>{if(V.tab==5)$('#app').innerHTML=view()},ML=()=>Z.Q.filter(x=>(Z.mode=='c')==(x.kind=='c'||x.kind=='s')),qn=()=>ML().filter(x=>Z.pk[x.id]).reduce((a,x)=>a+(x.qs?x.qs.length:1),0),CO=()=>Object.fromEntries(Object.entries(CL).filter(([k])=>Z.mode=='p'?+k>=3&&+k<=5:+k>=6)),LET=[...'কখগঘঙচছজঝঞটঠডঢণ'];
 async function ld(){try{const q=await DB.collection('qbank').where('cls','==',Z.cls).where('sub','==',Z.sub).get();Z.Q=q.docs.map(d=>d.data()).sort((a,b)=>a.ts-b.ts)}catch(e){alert('প্রশ্ন আনা যায়নি: '+e.message)}Z.pk={};draw()}
 /* ফর্ম */
@@ -41,14 +26,14 @@ const an=async(id,j,v)=>{const it=Z.Q.find(x=>x.id==id);it.qs[j].a=+v;try{await 
 const del=async id=>{if(!confirm('এই প্রশ্ন মুছবেন?'))return;await DB.collection('qbank').doc(id).delete();Z.Q=Z.Q.filter(x=>x.id!=id);draw()};
 const pk=(id,v)=>{Z.pk[id]=v;$('#pc').textContent=bn(qn())};
 /* টেক্সট ইম্পোর্ট */
-function parse(t){const L=t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),R=[];let G=null,need=0,exp=0,q=null,m;
+function parse(t){const L=t.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean),R=[];let G=null,need=0,exp=0,q=null,m;
  for(const l of L){
-  if(/উদ্দীপক/.test(l)&&/উত্তর দাও\s*[:：]?$/.test(l)){need=(l.match(/[০-৯]+/g)||[]).length>1?2:1;exp=1;continue}
+  if(/উদ্দীপক/.test(l)&&/উত্তর দাও\\s*[:：]?$/.test(l)){need=(l.match(/[০-৯]+/g)||[]).length>1?2:1;exp=1;continue}
   if(exp){G={kind:'u',stim:l,qs:[]};R.push(G);exp=0;continue}
-  if(m=l.match(/^[০-৯0-9]+\s*[।.]\s*(.+)/)){q={q:m[1],st:[],o:[],a:-1};if(G){G.qs.push(q);if(G.qs.length>=need)G=null}else R.push({kind:'g',stim:'',qs:[q]});continue}
+  if(m=l.match(/^[০-৯0-9]+\\s*[।.]\\s*(.+)/)){q={q:m[1],st:[],o:[],a:-1};if(G){G.qs.push(q);if(G.qs.length>=need)G=null}else R.push({kind:'g',stim:'',qs:[q]});continue}
   if(!q)continue;
-  if(/^i{1,3}\.\s/.test(l))q.st.push(...l.split(/\s+(?=i{1,3}\.\s)/).map(x=>x.replace(/^i{1,3}\.\s*/,'')));
-  else if(/^ক[.)]\s/.test(l))q.o=l.split(/\s+(?=[কখগঘ]\.\s)/).map(x=>x.replace(/^[কখগঘ][.)]\s*/,''));
+  if(/^i{1,3}\\.\\s/.test(l))q.st.push(...l.split(/\\s+(?=i{1,3}\\.\\s)/).map(x=>x.replace(/^i{1,3}\\.\\s*/,'')));
+  else if(/^ক[.)]\\s/.test(l))q.o=l.split(/\\s+(?=[কখগঘ]\\.\\s)/).map(x=>x.replace(/^[কখগঘ][.)]\\s*/,''));
   else if(!/^নিচের কোনটি সঠিক/.test(l))q.q+=' '+l}
  return R.filter(x=>x.qs.length&&x.qs.every(q=>{if(q.st.length&&!q.o.length)q.o=AUTO.slice();return q.o.length==4})).map(x=>{if(x.kind=='g'&&x.qs[0].st.length)x.kind='p';return x})}
 async function imp(){const its=parse($('#imt').value),src=$('#imsrc').value.trim()||'ইম্পোর্ট';if(!its.length)return alert('কোনো প্রশ্ন পড়া যায়নি। ফরম্যাট দেখুন।');if(its.length>400)return alert('একবারে সর্বোচ্চ ৪০০টি');
@@ -63,7 +48,7 @@ function sheet(si,L,x,ky){let n=0,b='';
    b+=`<div class="q"><b>${bn(n)}।</b> ${F(q.q)}${q.st.map((s,i)=>`<div class="si">${RM[i]}. ${F(s)}</div>`).join('')}${q.st.length?'<div>নিচের কোনটি সঠিক?</div>':''}<div class="op${w?' op1':''}">${q.o.map((t,i)=>`<div>(${KS[i]}) ${F(t)}</div>`).join('')}</div></div>`})});
  return `<div class="qs pb" style="--g:${+x.g||18}px">${hd(x,'বহুনির্বাচনি অভীক্ষা',si)}<hr><p class="qn">[বি: দ্র: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্তসমূহ হতে সঠিক/ সর্বোৎকৃষ্ট উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট কর। প্রতিটি প্রশ্নের মান ১। সকল প্রশ্নের উত্তর দিতে হবে।]</p><p class="qw"><b>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবে না।</b></p><div class="cl">${b}</div></div>`}
 const keyh=K=>`<div class="qs qk pb"><h3 style="text-align:center">উত্তরমালা (শিক্ষকের জন্য)</h3><table><tr><th>প্রশ্ন</th>${KS.map(k=>`<th>সেট ${k}</th>`).join('')}</tr>${K[0].map((_,i)=>`<tr><td>${bn(i+1)}</td>${K.map(k=>`<td>${k[i]}</td>`).join('')}</tr>`).join('')}</table></div>`;
-function gen(){pg.disabled=Z.mode!=='c';if(Z.mode=='p')return genp();if(Z.mode=='c')return genc();const it=Z.Q.filter(x=>Z.pk[x.id]);if(!it.length)return alert('প্রশ্ন বাছাই করুন');
+function gen(){if(Z.mode=='p')return genp();if(Z.mode=='c')return genc();const it=Z.Q.filter(x=>Z.pk[x.id]);if(!it.length)return alert('প্রশ্ন বাছাই করুন');
  const bad=it.filter(x=>x.qs.some(q=>q.a<0)).length;if(bad&&!confirm(bad+'টি প্রশ্নে সঠিক উত্তর দেওয়া নেই, উত্তরমালা অসম্পূর্ণ হবে। চালিয়ে যাবেন?'))return;
  const c=Z.cf,MK=(sl(Z.cls).find(a=>a[0]==Z.sub)||[0,0,qn()])[2],x={...c,m:c.m||MK,t:c.t||bn(MK)+' মিনিট',c:c.c||cd(Z.sub),sub:(sl(Z.cls).find(a=>a[0]==Z.sub)||['',''])[1]},K=[];let h='';
  [0,1,2,3].forEach(si=>{const ky=[];h+=sheet(si,mk4(si,it),x,ky);K.push(ky)});
@@ -77,17 +62,12 @@ document.addEventListener('input',e=>{const t=e.target;if(t.closest&&t.closest('
 const ci=(k,l)=>`<div><label>${l}</label><input value="${esc(Z.cf[k])}" oninput="QP.cf.${k}=this.value"></div>`;
 const row=(it,i)=>`<div class="sb"><label style="display:flex;gap:6px;align-items:flex-start;color:var(--fg);font-size:14px"><input type="checkbox" style="width:auto" ${Z.pk[it.id]?'checked':''} onchange="QP.pk('${it.id}',this.checked)"><span><b>${bn(i+1)}.</b> ${{u:'<em>[উদ্দীপক]</em> ',p:'<em>[বহুপদী]</em> ',c:'<em>[সৃজনশীল]</em> ',s:'<em>[সংক্ষিপ্ত]</em> '}[it.kind]||''}${F(((it.qs&&it.qs[0].q)||it.q||it.stim).slice(0,80))} <small>${esc(it.src||'')}</small></span></label><div class="g2">${(it.qs||[]).map((q,j)=>`<select onchange="QP.an('${it.id}',${j},this.value)"><option value="-1">উত্তর?</option>${KS.map((x,a)=>`<option value="${a}"${q.a==a?' selected':''}>${x}</option>`).join('')}</select>`).join('')}<button class="btn s r" onclick="QP.del('${it.id}')">মুছুন</button></div></div>`;
 const hd=(x,ttl,si)=>`<div class="qh"><div class="ql">${esc(x.l)}</div><div class="qm"><b>${esc(ttl)}</b>${x.sub?`<br><b>${esc(x.sub)}</b>`:''}<br><b>${esc(x.e)}</b><br><b>[${esc(x.s)}]</b><br>সময়—${esc(x.t)}<br>পূর্ণমান—${bn(x.m)}</div><div class="qb"${x.nb?' style="display:none"':''}><div>বিষয় কোড : ${[...bn(x.c)].map(d=>`<span class="bx">${d}</span>`).join('')}</div>${si==null?'':`<div>সেট : <span class="bx">${KS[si]}</span></div>`}</div></div>`;
-
-function genc(){
- pg.disabled=false;
- const it=Z.Q.filter(x=>Z.pk[x.id]),S_=it.filter(x=>x.kind=='s'),C=it.filter(x=>x.kind=='c');if(!it.length)return alert('প্রশ্ন বাছাই করুন');
+function genc(){const it=Z.Q.filter(x=>Z.pk[x.id]),S_=it.filter(x=>x.kind=='s'),C=it.filter(x=>x.kind=='c');if(!it.length)return alert('প্রশ্ন বাছাই করুন');
  const c=Z.cf,sub=(sl(Z.cls).find(a=>a[0]==Z.sub)||['',''])[1],na=+c.na||S_.length,nc=+c.nc||C.length,x={...c,sub:'',m:c.m||na*2+nc*10,c:c.c||cd(Z.sub),t:c.t||'২ ঘণ্টা ৩০ মিনিট'};let h='',n=0;
  if(S_.length){n=1;h+=`<div class="ct"><b>সংক্ষিপ্ত উত্তর প্রশ্ন</b><br>(যে কোনো ${bn(na)}টি প্রশ্নের উত্তর দাও)<br>মান—২×${bn(na)}=${bn(na*2)}</div><div class="pr"><span><b>১।</b> যে কোনো ${bn(na)}টি প্রশ্নের উত্তর দাও:</span><b></b></div>`+S_.map((q,i)=>`<div class="pr"><span>(${LET[i]}) ${F(q.q)}</span><b>২</b></div>`).join('')}
- if(C.length){h+=`<div class="ct"><b>সৃজনশীল প্রশ্ন</b><br>(যে কোনো ${bn(nc)}টি প্রশ্নের উত্তর দাও)<br>মান—১০×${bn(nc)}=${bn(nc*10)}</div>`;C.forEach(q=>{n++;h+=`<div class="cq"><b>${bn(n)}।</b> ${F(q.stim).replace(/\n/g,'<br>')}${q.parts.map((p,i)=>`<div class="pr"><span>(${KS[i]}) ${F(p)}</span><b>${bn(i+1)}</b></div>`).join('')}</div>`})}
- const nt=c.n||`ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ${S_.length?'সংক্ষিপ্ত উত্তর প্রশ্ন থেকে যে কোনো '+bn(na)+'টি এবং ':''}সৃজনশীল প্রশ্ন থেকে যে কোনো ঠিক ${bn(nc)}টি প্রশ্নের উত্তর দিতে হবে।`;
- Z.o=`<div class="qs pb" style="--g:${+c.g||18}px">${hd(x,sub+' (সৃজনশীল ও সংক্ষিপ্ত)')}<hr><p class="qn">[দ্রষ্টব্য: ${F(nt)}]</p><div class="pr" style="font-weight:700"><span></span><span>নম্বর</span></div>${h}</div>`;$('#qo').innerHTML=Z.o
-}
-
+ if(C.length){h+=`<div class="ct"><b>সৃজনশীল প্রশ্ন</b><br>(যে কোনো ${bn(nc)}টি প্রশ্নের উত্তর দাও)<br>মান—১০×${bn(nc)}=${bn(nc*10)}</div>`;C.forEach(q=>{n++;h+=`<div class="cq"><b>${bn(n)}।</b> ${F(q.stim).replace(/\\n/g,'<br>')}${q.parts.map((p,i)=>`<div class="pr"><span>(${KS[i]}) ${F(p)}</span><b>${bn(i+1)}</b></div>`).join('')}</div>`})}
+ const nt=c.n||`ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ${S_.length?'সংক্ষিপ্ত উত্তর প্রশ্ন থেকে যে কোনো '+bn(na)+'টি এবং ':''}সৃজনশীল প্রশ্ন থেকে যে কোনো ${bn(nc)}টি প্রশ্নের উত্তর দিতে হবে।`;
+ Z.o=`<div class="qs pb" style="--g:${+c.g||18}px">${hd(x,sub+' (সৃজনশীল)')}<hr><p class="qn">[দ্রষ্টব্য: ${F(nt)}]</p><div class="pr" style="font-weight:700"><span></span><span>নম্বর</span></div>${h}</div>`;$('#qo').innerHTML=Z.o}
 const en=t=>String(t).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)),tot=S=>S.reduce((a,x)=>a+(x.p?0:(+en(String(x.m).split('=').pop())||0)),0),nums=S=>{let n=0;return S.map(x=>x.p?'':++n)},tt=S=>{const T=tot(S);return 'মোট '+bn(T)+(T!=70?' <b style="color:#c0392b">⚠ ৭০ হয়নি, নম্বর মিলিয়ে নিন</b>':'')};
 const BN=[['কবি ও কবিতার নামসহ কবিতা লেখা','১×৫=৫']],SH=['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)'],W='১×৫=৫';
 const TPL={
@@ -98,7 +78,7 @@ en3:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Three','',
 en4:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Four','','p'],['Multiple Choice Questions/Identifying True or False for each statement','1×5=5'],['Fill in the blanks with appropriate words','1×5=5'],['Writing answers of the questions from the text/dialogue (5 short questions, all)','5'],['Rearranging words to make meaningful sentences','2×5=10'],['Using capital letters and punctuation marks/Changing singular-plural forms/Using correct prepositions/articles','1×5=5'],['Using correct form of verbs in the sentences','2×5=10'],['Making Wh-Questions','2×5=10'],['Writing informal letter with or without clues','10'],['Writing a short composition with clues or without clues','10']],
 en5:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Five','','p'],['Multiple Choice Questions/Write True or False for each statement','1×5=5'],['Fill in the blanks with appropriate words from the box','1×5=5'],['Write the answer to the following questions (3 short questions)','1+2+2=5'],['Reading a text/dialogue (Q.4–5) — unseen','','p'],['Matching words with their meanings','1×5=5'],['Writing question answer in short (3 short questions)','1+2+2=5'],['Rearranging words to make meaningful sentences','2×5=10'],['Using capital letters and punctuation marks/Using correct prepositions/articles/Making Wh-Questions/appropriate form of adjectives','2×5=10'],['Complete the sentences with the correct form of verbs','1×5=5'],['Write a short composition with clues or without clues','10'],['Writing informal/formal letter or an email with or without clues','10']],
 co:[['বহুনির্বাচনি প্রশ্ন (১০টি, সবকয়টির উত্তর)','১০×১=১০'],['শূন্যস্থান পূরণ (৫টি, ৫টিরই উত্তর)','৫×১=৫'],['শুদ্ধ/অশুদ্ধ নির্বাচন (৫টি, ৫টিরই উত্তর)','৫×১=৫'],['মিলকরণ (৫টি; ডানপাশে ২টি অতিরিক্ত বিকল্প)','৫×১=৫'],['সংক্ষিপ্ত/অল্প কথায় উত্তর (৭টির মধ্যে ৫টি)','৫×৩=১৫'],['বর্ণনামূলক প্রশ্ন (৭টির মধ্যে ৫টি)','৫×৬=৩০']]};
-const M0=[['বহুনির্বাচনি প্রশ্ন (১০টি, সবকয়টির উত্তর; ৩টি গাণিতিক ধারণা, ৪টি প্রক্রিয়াগত ধারণা, ৩টি সমস্যা সমাধানমূলক)','১০'],['শূন্যস্থান পূরণ (৫টি, ৫টিরই উত্তর)','১০'],['সংক্ষিপ্ত উত্তর প্রশ্ন (১০টি, ১০টিরই উত্তর; ৩টি গাণিতিক ধারণা, ৪টি প্রক্রিয়াগত ধারণা, ৩টি সমস্যা সমাধানমূলক)','১০']],G=['জ্যামিতি (৩টি থেকে ২টি)','10'];
+const M0=[['বহুনির্বাচনি প্রশ্ন (১০টি, সবকয়টির উত্তর; ৩টি গাণিতিক ধারণা, ৪টি প্রক্রিয়াগত ধারণা, ৩টি সমস্যা সমাধানমূলক)','১০'],['শূন্যস্থান পূরণ (৫টি, ৫টিরই উত্তর)','১০'],['সংক্ষিপ্ত উত্তর প্রশ্ন (১০টি, ১০টিরই উত্তর; ৩টি গাণিতিক ধারণা, ৪টি প্রক্রিয়াগত ধারণা, ৩টি সমস্যা সমাধানমূলক)','১০']],G=['জ্যামিতি (৩টি থেকে ২টি)','১০'];
 const MT={'3|1':[['যোগ করি (২টি, ২টিরই)','৬'],['যোগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['বিয়োগ করি (২টি, ২টিরই)','৬'],['বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['যোগ ও বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],G],
 '3|2':[['গুণ করি (২টি, ২টিরই)','৬'],['গুণ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['ভাগ করি (২টি, ২টিরই)','৬'],['ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['গুণ ও ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],G],
 '3|3':[['যোগ, বিয়োগ, গুণ ও ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৫'],['ভগ্নাংশের যোগ ও বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৫'],['বাংলাদেশি মুদ্রা সংক্রান্ত সমস্যা (২টি, ২টিরই)','৫'],['পরিমাপ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৫'],G,['উপাত্ত সংগ্রহ ও বিন্যস্তকরণ','১০']],
@@ -116,15 +96,14 @@ function viewp(){const S=PS();return `<div class="card"><h3>প্রশ্ন�
 <div class="card"><h3>প্রশ্ন লিখুন <small id="tot">${tt(S)}</small></h3><div id="tb">${TB}</div><div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>প্রিভিউ</small></div><small>প্রতিটি ঘরে সেই অংশের প্রশ্নগুলো লিখুন (প্রতি লাইনে একটি)। শিরোনাম ও নম্বর বদলানো যায়।</small><div id="fm">${sec(S)}</div></div>
 <div class="card"><h3>প্রশ্নপত্র তৈরি</h3><div class="g">${ci('e','পরীক্ষার নাম')}${ci('s','সিলেবাস লাইন')}${ci('t','সময় (ফাঁকা = ২ ঘণ্টা ৩০ মিনিট)')}${ci('m','পূর্ণমান (ফাঁকা = যোগফল)')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}${ci('l','বাঁ পাশের লেখা')}</div><p><button class="btn" onclick="QP.gen()">প্রশ্নপত্র তৈরি করুন</button> <button class="btn" onclick="print()">🖨 প্রিন্ট (লিগ্যাল)</button></p></div><div id="qo">${Z.o}</div>`}
 function genp(){const S=PS(),c=Z.cf,N=nums(S),sn=(psl().find(a=>a[0]==Z.sub)||['',''])[1],x={...c,sub:sn,m:c.m||tot(S),nb:1,t:c.t||'২ ঘণ্টা ৩০ মিনিট'},
- h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\n/g,'<br>')}</div></div>`:`<div class="pr"><span><b>${bn(N[i])}।</b> ${F(q.t)}</span><b>${esc(q.m)}</b></div><div class="sx">${F(q.x).replace(/\n/g,'<br>')}</div>`).join('');
+ h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\\n/g,'<br>')}</div></div>`:`<div class="pr"><span><b>${bn(N[i])}।</b> ${F(q.t)}</span><b>${esc(q.m)}</b></div><div class="sx">${F(q.x).replace(/\\n/g,'<br>')}</div>`).join('');
  Z.o=`<div class="qs pb" style="--g:${+c.g||18}px">${hd(x,CL[Z.cls])}<hr><p class="qn">[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।]</p><div class="pr" style="font-weight:700"><span></span><span>নম্বর</span></div>${h}</div>`;$('#qo').innerHTML=Z.o}
-function view(){if(Z.mode=='p')return viewp();const ss=sl(Z.cls);if(!Z.sub||!ss.some(x=>x[0]==Z.sub))Z.sub=ss[0][0];
+function view(){if(Z.mode=='p')return viewp();const ss=sl(Z.cls);if(!Z.sub)Z.sub=ss[0][0];
  return `<div class="card"><h3>প্রশ্নব্যাংক ও প্রশ্নপত্র</h3><div class="g"><div><label>ধরন</label><select onchange="QP.md(this.value)">${opts({m:'এমসিকিউ',c:'সৃজনশীল ও সংক্ষিপ্ত উত্তর',p:'প্রাথমিক (৩য়–৫ম) প্রশ্নপত্র'},Z.mode)}</select></div></div><div class="g"><div><label>শ্রেণি</label><select onchange="QP.cl(this.value)">${opts(CO(),Z.cls)}</select></div><div><label>বিষয়</label><select onchange="QP.sb(this.value)">${ss.map(([i,n])=>`<option value="${i}"${i==Z.sub?' selected':''}>${n}</option>`).join('')}</select></div></div></div>
 <div class="card"><h3>নতুন প্রশ্ন</h3><label>ধরন</label><select onchange="QP.kd(this.value)">${opts(Z.mode=='c'?{c:'সৃজনশীল (উদ্দীপক + ক–ঘ)',s:'সংক্ষিপ্ত উত্তর'}:{g:'সাধারণ বহুনির্বাচনি',p:'বহুপদী সমাপ্তিসূচক',u:'উদ্দীপকভিত্তিক'},Z.k)}</select><div id="tb">${TB}</div><div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>প্রিভিউ</small></div><div id="fm">${fm()}</div></div>
 <div class="card" style="${Z.mode=='c'?'display:none':''}"><details><summary><b>টেক্সট থেকে একসাথে ইম্পোর্ট</b></summary><p><small>প্রতি প্রশ্ন: "১। প্রশ্ন" লাইনের পর "ক. … খ. … গ. … ঘ. …" লাইন। বহুপদীতে "i. …" লাইন যোগ করুন। উদ্দীপকের আগে "নিচের উদ্দীপকটি পড়ে ২৮ ও ২৯ নং প্রশ্নের উত্তর দাও:" লাইন, তার পরের লাইনে উদ্দীপক।</small></p><textarea id="imt" rows="6"></textarea><input id="imsrc" placeholder="উৎস, যেমন ঢাকা বোর্ড ২০২৫"><p><button class="btn" onclick="QP.imp()">ইম্পোর্ট</button></p></details></div>
 <div class="card"><h3>ব্যাংকের প্রশ্ন (${bn(ML().length)})</h3>${ML().map(row).join('')||'<small>এই শ্রেণি ও বিষয়ে এখনো প্রশ্ন নেই</small>'}</div>
-<div class="card"><h3>প্রশ্নপত্র তৈরি <small>(<span id="pc">${bn(qn())}</span>টি প্রশ্ন বাছাই)</small></h3><div class="g">${ci('e','পরীক্ষার নাম')}${ci('s','সিলেবাস লাইন')}${ci('t','সময় (ফাঁকা = নম্বর অনুযায়ী মিনিট)')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}${Z.mode=='c'?ci('na','সংক্ষিপ্ত: কয়টির উত্তর')+ci('nc','সৃজনশীল: কয়টির উত্তর')+ci('n','দ্রষ্টব্য লাইন (ফাঁকা = নিজে)'):''}${ci('m','পূর্ণমান (ফাঁকা = প্রশ্নসংখ্যা)')}${ci('c','বিষয় কোড (ফাঁকা = নিজে)')}${ci('l','বাঁ পাশের লেখা')}</div><p><button class="btn" onclick="QP.gen()">${Z.mode=='c'?'প্রশ্নপত্র তৈরি করুন':'৪ সেট তৈরি করুন'}</button> <button class="btn" onclick="print()">🖨 প্রশ্নপত্র প্রিন্ট (ল্যান্ডস্কেপ)</button> <button class="btn" onclick="QP.pkey()">উত্তরমালা প্রিন্ট</button></p></div><div id="qo">${Z.o}</div>`}
-
+<div class="card"><h3>প্রশ্নপত্র তৈরি <small>(<span id="pc">${bn(qn())}</span>টি প্রশ্ন বাছাই)</small></h3><div class="g">${ci('e','পরীক্ষার নাম')}${ci('s','সিলেবাস লাইন')}${ci('t','সময় (ফাঁকা = নম্বর অনুযায়ী মিনিট)')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}${Z.mode=='c'?ci('na','সংক্ষিপ্ত: কয়টির উত্তর')+ci('nc','সৃজনশীল: কয়টির উত্তর')+ci('n','দ্রষ্টব্য লাইন (ফাঁকা = নিজে)'):''}${ci('m','পূর্ণমান (ফাঁকা = প্রশ্নসংখ্যা)')}${ci('c','বিষয় কোড (ফাঁকা = নিজে)')}${ci('l','বাঁ পাশের লেখা')}</div><p><button class="btn" onclick="QP.gen()">${Z.mode=='c'?'প্রশ্নপত্র তৈরি করুন':'৪ সেট তৈরি করুন'}</button> <button class="btn" onclick="print()">🖨 প্রশ্নপত্র প্রিন্ট (লিগ্যাল)</button> <button class="btn" onclick="QP.pkey()">উত্তরমালা প্রিন্ট</button></p></div><div id="qo">${Z.o}</div>`}
 /* স্টাইল ও হুক */
 const css=document.createElement('style');css.textContent=`@font-face{font-family:NikoshBAN;src:local('NikoshBAN'),local('Nikosh'),url('NikoshBAN.ttf')}
 .qs{background:#fff;color:#111;font-family:NikoshBAN,'Noto Serif Bengali',serif;font-size:13px;line-height:1.5;padding:14px;max-width:820px;margin:0 auto 16px;border:1px solid #bbb;overflow-x:auto}
@@ -133,16 +112,18 @@ const css=document.createElement('style');css.textContent=`@font-face{font-famil
 .cl{column-count:2;column-gap:26px;column-rule:1px solid #111}.q{break-inside:avoid;margin:var(--g,18px) 0}.pas{margin:12px 0;font-style:italic}.sx{margin:0 0 var(--g,18px) 22px}.ct{text-align:center;margin:16px 0 8px}.pr{display:flex;justify-content:space-between;gap:12px;margin:var(--g,18px) 0}.pr b{min-width:20px;text-align:right}.cq{margin:calc(var(--g,18px)*1.4) 0;break-inside:avoid}.si{margin-left:16px}.op{display:grid;grid-template-columns:1fr 1fr;margin-left:16px}.op1{grid-template-columns:1fr}
 .iso{display:inline-flex;flex-direction:column;vertical-align:middle;line-height:1;font-size:.8em;margin-right:1px}.iso sup,.iso sub{position:static;vertical-align:baseline;line-height:1.1;font-size:1em}.qs table{width:100%;border-collapse:collapse}.qs td,.qs th{border:1px solid #444;padding:3px;text-align:center}
 @media(max-width:600px){.cl{column-count:1}}@media print{.qk{display:none}body.pk .qs{display:none}body.pk .qk{display:block}.qs{border:0;max-width:none;margin:0;padding:0}.cl{column-count:2!important}}`;document.head.appendChild(css);
-
-/* সৃজনশীল ও সংক্ষিপ্ত প্রশ্নের জন্য A4 Landscape প্রিন্ট লেআউট */
-const pg=document.createElement('style');pg.textContent='@media print{@page{size:A4 landscape;margin:10mm}}';document.head.appendChild(pg);pg.disabled=true;
-
+const pg=document.createElement('style');pg.textContent='@media print{@page{size:8.5in 14in;margin:10mm}}';document.head.appendChild(pg);pg.disabled=true;
 const R0=render;
 window.render=function(){const on=V.tab==5;if(on)V.tab=0;R0();if(on)V.tab=5;const nv=$('#nav');
- let qpBtn=nv.querySelector('#qpaper-btn');
- if(!qpBtn){nv.insertAdjacentHTML('beforeend',`<button id="qpaper-btn" class="${on?'on':''}" onclick="V.tab=5;render()">প্রশ্নপত্র</button>`);}
- else{qpBtn.className=on?'on':'';qpBtn.onclick=()=>{V.tab=5;render()}}
- if(on){if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld()}$('#app').innerHTML=view()}pg.disabled=Z.mode!=='c'};
+ if(on)nv.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+ nv.insertAdjacentHTML('beforeend',`<button class="${on?'on':''}" onclick="V.tab=5;render()">প্রশ্নপত্র</button>`);
+ if(on){if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld()}$('#app').innerHTML=view()}pg.disabled=!on};
 window.onafterprint=()=>document.body.classList.remove('pk');
 window.QP={md:v=>{Z.mode=v;Z.Q=[];Z.pk={};Z.o='';if(v=='p'){if(+Z.cls<3||+Z.cls>5)Z.cls='3';Z.sub='bn';draw();return}if(+Z.cls<6)Z.cls='9';Z.sub=sl(Z.cls)[0][0];Z.k=v=='c'?'c':'g';draw();ld()},tm:v=>{Z.tm=v;draw()},ps:(i,k,v)=>{PS()[i][k]=v;if(k=='m'){const e=$('#tot');if(e)e.innerHTML=tt(PS())}},cf:Z.cf,ins,add,an,del,pk,imp,gen,cl:v=>{Z.cls=v;if(Z.mode=='p'){Z.sub='bn';draw();return}Z.sub=sl(v)[0][0];Z.Q=[];draw();ld()},sb:v=>{Z.sub=v;if(Z.mode=='p'){draw();return}Z.Q=[];draw();ld()},kd:v=>{Z.k=v;$('#fm').innerHTML=fm()},pkey:()=>{document.body.classList.add('pk');print()},_t:{parse,mk4,F}};
 })();
+"""
+
+with open("qpaper.js", "w", encoding="utf-8") as f:
+    f.write(js_code)
+
+print("qpaper.js file generated successfully.")
