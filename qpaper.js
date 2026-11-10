@@ -1,13 +1,13 @@
-/* qpaper.js — প্রশ্নব্যাংক + প্রশ্নপত্র প্রস্তুতকারক (নতুন কারিকুলাম ও এসএসসি ২০২৭) */
+/* qpaper.js — প্রশ্নব্যাংক + এমসিকিউ ও সৃজনশীল প্রশ্নপত্র প্রস্তুতকারক */
 (()=>{
 const KS=['ক','খ','গ','ঘ'],RM=['i','ii','iii'],AUTO=['i ও ii','ii ও iii','i ও iii','i, ii ও iii'];
 const CODE={bn:101,bn1:101,bn2:102,en:107,en1:107,en2:108,ma:109,ict:154,che:137,hm:126,phy:136,bio:138,bgs:150,sci:127,econ:141,civ:140,his:153,geo:110,acc:146,ent:143,fin:152,agri:134,home:151},RC={'ইসলাম':111,'হিন্দু':112,'বৌদ্ধ':113,'খ্রিষ্টান':114};
-const Z={cls:'9',sub:'',k:'g',mode:'m',P:{},tm:'1',Q:[],pk:{},o:'',cf:{e:'নির্বাচনী পরীক্ষা-২০২৬',s:'২০২৭ শিক্ষাবর্ষের সিলেবাস অনুযায়ী',t:'',m:'',c:'',l:'বিদ্যালয়ের নাম',g:18,na:'',nc:'',n:''},last:null};
+const Z={cls:'9',sub:'',k:'g',mode:'m',P:{},tm:'1',Q:[],pk:{},o:'',cf:{e:'নির্বাচনী পরীক্ষা-২০২৬',s:'২০২৭ শিক্ষাবর্ষের সিলেবাস অনুযায়ী',t:'',m:'',c:'',l:'পানিপুর জেলা স্কুল',g:18,na:'',nc:'',n:''},last:null};
 
-const getEffectiveCls = (cls) => (cls === '10' ? '9' : cls);
+const getEffCls = c => (c === '10' ? '9' : c);
 
 const sl=c=>{
-  if(Z.mode==='p') return psl();
+  const r=[],K=Z.mode=='c'?'c':'m';
   if(c=='6'||c=='7'||c=='8'){
     return [
       ['bn1','বাংলা প্রথম পত্র',100],
@@ -31,9 +31,25 @@ const sl=c=>{
       ['che','রসায়ন',75],
       ['bio','জীববিজ্ঞান',75],
       ['hm','উচ্চতর গণিত',75],
+      ['fi','ফিন্যান্স ও ব্যাংকিং',100],
+      ['bi','ব্যবসায় উদ্যোগ',100],
+      ['his','বাংলাদেশের ইতিহাস ও বিশ্বসভ্যতা',100],
+      ['civ','পৌরনীতি ও নাগরিকতা',100],
+      ['geo','ভূগোল',100],
+      ['stat','অর্থনীতি',100],
+      ['agri','কৃষিশিক্ষা',75],
+      ['home','গাহর্স্থ্য বিজ্ঞান',75],
       ['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100],
+      ['ma','সাধারণ গণিত',100],
       ['sci','সাধারণ বিজ্ঞান',100]
     ];
+  }
+  if(typeof subs === 'function'){
+    subs(c,null).forEach(({s})=>{
+      const p=(s.parts||[]).find(p=>p.k==K);
+      if(p)s.id=='rel'?Object.keys(RN).forEach(k=>r.push(['rel_'+k,RN[k],p.m])):r.push([s.id,s.n,p.m])
+    });
+    if(r.length) return r;
   }
   return [['bn1','বাংলা প্রথম পত্র',100],['ma','সাধারণ গণিত',100]];
 };
@@ -49,13 +65,7 @@ const F=(s,a=/^(che|sci|bio|phy|agri|home)$/.test(Z.sub))=>{
   return a?r.replace(/([A-Za-z)\]])(\d+)/g,'$1<sub>$2</sub>'):r;
 };
 
-const draw=()=>{
-  if(typeof V !== 'undefined' && V.tab == 5) {
-    const appEl = document.getElementById('app');
-    if(appEl) appEl.innerHTML = view();
-  }
-};
-
+const draw=()=>{if(typeof V!=='undefined' && V.tab==5)$('#app').innerHTML=view()};
 const ML=()=>Z.Q.filter(x=>(Z.mode=='c')==(x.kind=='c'||x.kind=='s'));
 const qn=()=>ML().filter(x=>Z.pk[x.id]).reduce((a,x)=>a+(x.qs?x.qs.length:1),0);
 const CO=()=>Object.fromEntries(Object.entries(typeof CL!=='undefined'?CL:{'3':'তৃতীয় শ্রেণি','4':'চতুর্থ শ্রেণি','5':'পঞ্চম শ্রেণি','6':'ষষ্ঠ শ্রেণি','7':'সপ্তম শ্রেণি','8':'অষ্টম শ্রেণি','9':'নবম শ্রেণি','10':'দশম শ্রেণি'}).filter(([k])=>Z.mode=='p'?+k>=3&&+k<=5:+k>=6));
@@ -63,13 +73,13 @@ const LET=[...'কখগঘঙচছজঝঞটঠডঢণ'];
 
 async function ld(){
   try{
-    const effCls = getEffectiveCls(Z.cls);
-    if(typeof DB !== 'undefined') {
+    const effCls = getEffCls(Z.cls);
+    if(typeof DB !== 'undefined'){
       const q=await DB.collection('qbank').where('cls','==',effCls).where('sub','==',Z.sub).get();
       Z.Q=q.docs.map(d=>d.data()).sort((a,b)=>a.ts-b.ts);
     }
   }catch(e){
-    console.warn('অফলাইন বা কোয়েরি সমস্যা:', e.message);
+    console.warn('প্রশ্ন আনা যায়নি: '+e.message);
   }
   Z.pk={};
   draw();
@@ -88,15 +98,16 @@ function handleImgUpload(e, targetId){
   reader.readAsDataURL(file);
 }
 
+/* ফর্ম */
 const slot=(n,st)=>`<div class="sb"><label>প্রশ্ন ${bn(n)}</label><textarea id="f${n}q" rows="2"></textarea>${st?[1,2,3].map(i=>`<input id="f${n}s${i}" placeholder="${RM[i-1]}. বিবৃতি">`).join(''):''}<div class="g2">${[0,1,2,3].map(i=>`<input id="f${n}o${i}" placeholder="${KS[i]}. অপশন">`).join('')}</div><label>সঠিক উত্তর</label><select id="f${n}a"><option value="-1">—</option>${KS.map((x,i)=>`<option value="${i}">${x}</option>`).join('')}</select></div>`;
-const SRC='<label>উৎস (যেমন: ঢাকা বোর্ড ২০২৫)</label><input id="src"><label>উদ্দীপক ছবি (ঐচ্ছিক)</label><input type="file" accept="image/*" onchange="QP.imgUp(event,\'img_data\')"><input type="hidden" id="img_data"><img id="img_data_img_pvw" style="max-height:80px;display:block;margin:4px 0;">';
+const SRC='<label>উৎস (যেমন ঢাকা বোর্ড ২০২৫)</label><input id="src"><label>উদ্দীপক ছবি (ঐচ্ছিক)</label><input type="file" accept="image/*" onchange="QP.imgUp(event,\'img_data\')"><input type="hidden" id="img_data"><img id="img_data_img_pvw" style="max-height:80px;display:block;margin:4px 0;">';
 const BTN='<p><button class="btn" onclick="QP.add()">+ ব্যাংকে যোগ করুন</button></p>';
 
 const fm=()=>{
   const k=Z.k;
   if(k=='c')return'<label>উদ্দীপক</label><textarea id="cst" rows="4"></textarea>'+KS.map((x,i)=>`<label>(${x}) — ${bn(i+1)} নম্বর</label><textarea id="cp${i}" rows="2"></textarea>`).join('')+SRC+BTN;
-  if(k=='s')return'<label>প্রশ্ন (সংক্ষিপ্ত - ২ নম্বর)</label><textarea id="sq" rows="2"></textarea>'+SRC+BTN;
-  return (k=='u'?'<label>উদ্দীপক</label><textarea id="fst" rows="3"></textarea>':'')+(k=='p'?'<small>অপশন ফাঁকা রাখলে "i ও ii…" নিজে বসবে</small>':'')+slot(1,k!='g')+(k=='u'?slot(2,1):'')+SRC+BTN;
+  if(k=='s')return'<label>প্রশ্ন (২ নম্বর)</label><textarea id="sq" rows="2"></textarea>'+SRC+BTN;
+  return(k=='u'?'<label>উদ্দীপক</label><textarea id="fst" rows="3"></textarea>':'')+(k=='p'?'<small>অপশন ফাঁকা রাখলে "i ও ii…" নিজে বসবে</small>':'')+slot(1,k!='g')+(k=='u'?slot(2,1):'')+SRC+BTN;
 };
 
 const rd=n=>{const v=k=>(document.getElementById('f'+n+k)||{value:''}).value.trim();return{q:v('q'),st:[1,2,3].map(i=>v('s'+i)).filter(Boolean),o:[0,1,2,3].map(i=>v('o'+i)),a:+(document.getElementById('f'+n+'a')||{value:-1}).value}};
@@ -104,7 +115,7 @@ const fx=q=>{if(q.st.length&&!q.o.some(Boolean))q.o=AUTO.slice();return q};
 
 async function addc(){
   const k=Z.k,v=i=>(document.getElementById(i)||{value:''}).value.trim();
-  const effCls = getEffectiveCls(Z.cls);
+  const effCls = getEffCls(Z.cls);
   const it={id:'q'+Date.now(),cls:effCls,sub:Z.sub,kind:k,src:v('src'),img:v('img_data'),ts:Date.now()};
   if(k=='c'){
     it.stim=v('cst');
@@ -126,7 +137,7 @@ async function add(){
   if(k=='p'&&!qs[0].st.length)return alert('i, ii, iii বিবৃতি লিখুন');
   const stim=(document.getElementById('fst')||{value:''}).value.trim();
   if(k=='u'&&!stim)return alert('উদ্দীপক লিখুন');
-  const effCls = getEffectiveCls(Z.cls);
+  const effCls = getEffCls(Z.cls);
   const it={id:'q'+Date.now(),cls:effCls,sub:Z.sub,kind:k,stim,qs,src:(document.getElementById('src')||{value:''}).value.trim(),img:(document.getElementById('img_data')||{value:''}).value.trim(),ts:Date.now()};
   try{if(typeof DB!=='undefined') await DB.collection('qbank').doc(it.id).set(it);}catch(e){}
   Z.Q.push(it);
@@ -167,6 +178,7 @@ const pk=(id,v)=>{
   if(pcEl) pcEl.textContent=bn(qn());
 };
 
+/* টেক্সট ইম্পোর্ট */
 function parse(t){
   const L=t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),R=[];
   let G=null,need=0,exp=0,q=null,m;
@@ -186,18 +198,20 @@ async function imp(){
   const imtEl = document.getElementById('imt');
   if(!imtEl) return;
   const its=parse(imtEl.value),src=(document.getElementById('imsrc')||{value:''}).value.trim()||'ইম্পোর্ট';
-  if(!its.length)return alert('কোনো প্রশ্ন পড়া যায়নি। সঠিক ফরম্যাটে লিখুন।');
-  const effCls = getEffectiveCls(Z.cls);
+  if(!its.length)return alert('কোনো প্রশ্ন পড়া যায়নি। ফরম্যাট দেখুন।');
+  if(its.length>400)return alert('একবারে সর্বোচ্চ ৪০০টি');
+  const effCls = getEffCls(Z.cls);
   const T=Date.now();
   its.forEach((x,i)=>{
     Object.assign(x,{id:'q'+T+i,cls:effCls,sub:Z.sub,src,ts:T+i});
     try{ if(typeof DB!=='undefined') DB.collection('qbank').doc(x.id).set(x); }catch(e){}
     Z.Q.push(x);
   });
-  alert(bn(its.length)+'টি প্রশ্ন যোগ হয়েছে!');
+  alert(bn(its.length)+'টি প্রশ্ন যোগ হয়েছে।');
   draw();
 }
 
+/* সেট তৈরি */
 const rng=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296},sh=(a,r)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const mk4=(si,it)=>{const r=rng(9001+si*7919);return(si?sh(it,r):it).map(x=>({...x,qs:x.qs.map(q=>{if(!si||q.st.length||/সবগুলো|উপরের|কোনোটিই/.test(q.o.join()))return q;const ix=sh([0,1,2,3],r);return{...q,o:ix.map(i=>q.o[i]),a:q.a<0?-1:ix.indexOf(q.a)}})}))};
 
@@ -223,6 +237,8 @@ function gen(){
   if(Z.mode=='c')return genc();
   const it=Z.Q.filter(x=>Z.pk[x.id]);
   if(!it.length)return alert('প্রশ্ন বাছাই করুন');
+  const bad=it.filter(x=>x.qs.some(q=>q.a<0)).length;
+  if(bad&&!confirm(bad+'টি প্রশ্নে সঠিক উত্তর দেওয়া নেই, উত্তরমালা অসম্পূর্ণ হবে। চালিয়ে যাবেন?'))return;
   const c=Z.cf,MK=(sl(Z.cls).find(a=>a[0]==Z.sub)||[0,0,qn()])[2],x={...c,m:c.m||MK,t:c.t||bn(MK)+' মিনিট',c:c.c||cd(Z.sub),sub:(sl(Z.cls).find(a=>a[0]==Z.sub)||['',''])[1]},K=[];let h='';
   [0,1,2,3].forEach(si=>{const ky=[];h+=sheet(si,mk4(si,it),x,ky);K.push(ky)});
   Z.o=h+keyh(K);
@@ -230,11 +246,12 @@ function gen(){
   if(qoEl) qoEl.innerHTML=Z.o;
 }
 
+/* সূত্রের বোতাম */
 const TB=[['নিচে ₂','_{}'],['উপরে ²','^{}'],['⁵⁶₂₆','^{}_{}'],['⁺','^{+}'],['⁻','^{-}'],['²⁺','^{2+}'],['²⁻','^{2-}'],['³⁺','^{3+}'],['³⁻','^{3-}'],['→','→'],['⇌','⇌'],['Δ','Δ'],['°','°'],['↑','↑'],['↓','↓'],['×','×'],['−','−']].map(([l,t])=>`<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.ins('${t}')">${l}</button>`).join('');
 
 const ins=t=>{
   const e=Z.last;
-  if(!e)return alert('আগে একটি ইনপুট ঘরে ক্লিক করুন');
+  if(!e)return alert('আগে একটি ঘরে ক্লিক করুন');
   const s=e.selectionStart,v=e.value,c=t.indexOf('{'),p=c>=0&&t[c+1]=='}'?s+c+1:s+t.length;
   e.value=v.slice(0,s)+t+v.slice(e.selectionEnd);
   e.focus();
@@ -245,10 +262,9 @@ const ins=t=>{
 document.addEventListener('focusin',e=>{if(e.target.closest&&e.target.closest('#fm'))Z.last=e.target});
 document.addEventListener('input',e=>{const t=e.target;if(t.closest&&t.closest('#fm')){Z.last=t;const p=document.getElementById('pvw');if(p)p.innerHTML=F(t.value)}});
 
+/* ভিউ */
 const ci=(k,l)=>`<div><label>${l}</label><input value="${esc(Z.cf[k])}" oninput="QP.cf.${k}=this.value"></div>`;
-
 const row=(it,i)=>`<div class="sb"><label style="display:flex;gap:6px;align-items:flex-start;color:var(--fg);font-size:14px"><input type="checkbox" style="width:auto" ${Z.pk[it.id]?'checked':''} onchange="QP.pk('${it.id}',this.checked)"><span><b>${bn(i+1)}.</b> ${{u:'<em>[উদ্দীপক]</em> ',p:'<em>[বহুপদী]</em> ',c:'<em>[সৃজনশীল]</em> ',s:'<em>[সংক্ষিপ্ত]</em> '}[it.kind]||''}${F(((it.qs&&it.qs[0].q)||it.q||it.stim).slice(0,80))} <small>${esc(it.src||'')}</small></span></label><div class="g2">${(it.qs||[]).map((q,j)=>`<select onchange="QP.an('${it.id}',${j},this.value)"><option value="-1">উত্তর?</option>${KS.map((x,a)=>`<option value="${a}"${q.a==a?' selected':''}>${x}</option>`).join('')}</select>`).join('')}<button class="btn s" onclick="QP.edit('${it.id}')">সম্পাদনা</button><button class="btn s r" onclick="QP.del('${it.id}')">মুছুন</button></div></div>`;
-
 const hd=(x,ttl,si)=>`<div class="qh"><div class="ql">${esc(x.l)}</div><div class="qm"><b>${esc(ttl)}</b>${x.sub?`<br><b>${esc(x.sub)}</b>`:''}<br><b>${esc(x.e)}</b><br><b>[${esc(x.s)}]</b><br>সময়—${esc(x.t)}<br>পূর্ণমান—${bn(x.m)}</div><div class="qb"${x.nb?' style="display:none"':''}><div>বিষয় কোড : ${[...bn(x.c)].map(d=>`<span class="bx">${d}</span>`).join('')}</div>${si==null?'':`<div>সেট : <span class="bx">${KS[si]}</span></div>`}</div></div>`;
 
 function genc(){
@@ -273,229 +289,97 @@ function genc(){
   if(qoEl) qoEl.innerHTML=Z.o;
 }
 
-const en=t=>String(t).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)),tot=S=>S.reduce((a,x)=>a+(x.p?0:(+en(String(x.m).split('=').pop())||0)),0),nums=S=>{let n=0;return S.map(x=>x.p?'':++n)},tt=S=>{const T=tot(S);return 'মোট '+bn(T)+(T!=100?' <b style="color:#c0392b"> (মোট নম্বর: '+bn(T)+')</b>':'')};
+/* হুবহু সোর্স ফাইলের প্রাথমিকে প্রশ্ন কাঠামো (অপরিবর্তিত) */
+const en=t=>String(t).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)),tot=S=>S.reduce((a,x)=>a+(x.p?0:(+en(String(x.m).split('=').pop())||0)),0),nums=S=>{let n=0;return S.map(x=>x.p?'':++n)},tt=S=>{const T=tot(S);return 'মোট '+bn(T)+(T!=70?' <b style="color:#c0392b">⚠ ৭০ হয়নি, নম্বর মিলিয়ে নিন</b>':'')};
+const TPL={
+bn3:[['কবি ও কবিতার নামসহ কবিতা লেখা','১×৫=৫'],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৩×৫=১৫'],['রচনামূলক প্রশ্ন (৩টির মধ্যে ২টি)','৫×২=১০'],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন','১×৫=৫'],['যুক্তবর্ণ ভেঙে লেখা ও শব্দ তৈরি করা (৭টির মধ্যে ৫টি)','১×৫=৫'],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)','১×৫=৫'],['বিরামচিহ্নের ব্যবহার/স্ত্রীবাচক/পুরুষবাচক শব্দ','১×৫=৫'],['একই কথায় প্রকাশ/বিপরীত/সমার্থক শব্দ লেখা (৭টির মধ্যে ৫টি)','১×৫=৫'],['ফরম পূরণ করা','১×৫=৫'],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১০×১=১০']],
+bn4:[['কবি ও কবিতার নামসহ কবিতা লেখা','১×৫=৫'],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৫×২=১০'],['রচনামূলক প্রশ্ন (৪টির মধ্যে ৩টি)','৫×৩=১৫'],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)','১×৫=৫'],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন','১×৫=৫'],['বিপরীত শব্দ/সমার্থক শব্দ/ক্রিয়ার কাল (৭টির মধ্যে ৫টি)','১×৫=৫'],['বিরামচিহ্নের ব্যবহার/একক কথায় প্রকাশ','১×৫=৫'],['যুক্তবর্ণ ভেঙে শব্দ তৈরি ও শব্দ দিয়ে বাক্য তৈরি (৭টির মধ্যে ৫টি)','১×৫=৫'],['কবিতার মূলভাব লিখন/ফরমপূরণ/বিজ্ঞপ্তি (১টি)','১×৫=৫'],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১×১০=১০']],
+bn5:[['কবি ও কবিতার নামসহ কবিতা লেখা','১×৫=৫'],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৫×২=১০'],['রচনামূলক প্রশ্ন (৪টির মধ্যে ৩টি)','৫×৩=১৫'],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)','১×৫=৫'],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন','১×৫=৫'],['বিপরীত শব্দ/সমার্থক শব্দ/ক্রিয়ার কাল/স্ত্রীবাচক ও পুরুষবাচক শব্দ/সাধু ও চলিত রূপ (৭টির মধ্যে ৫টি)','১×৫=৫'],['বিরামচিহ্নের ব্যবহার/একক কথায় প্রকাশ/অনুচ্ছেদ থেকে প্রশ্ন তৈরি','১×৫=৫'],['যুক্তবর্ণ ভেঙে শব্দ তৈরি ও শব্দ দিয়ে বাক্য তৈরি (৭টির মধ্যে ৫টি)','১×৫=৫'],['গদ্য অনুচ্ছেদের/কবিতার মূলভাব লিখন/ফরমপূরণ/আবেদনপত্র/চিঠি লিখন (১টি)','১×৫=৫'],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১×১০=১০']],
+en3:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Three','','p'],['Multiple Choice Questions/Identifying True or False for each statement','1×5=5'],['Fill in the blanks with appropriate words from the box','1×5=5'],['Writing answers of the questions from the text/dialogue (5 short questions, all)','10'],['Matching words with their meanings','2×5=10'],['Writing the numbers in words/ordinal numbers','2×5=10'],['Rearranging words to make meaningful sentences','2×5=10'],['Using capital letters and punctuation marks/Changing singular-plural forms','1×5=5'],['Identifying noun, pronoun, verb/Making negative forms','1×5=5'],['Writing short composition with clues or without clues','10']],
+en4:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Four','','p'],['Multiple Choice Questions/Identifying True or False for each statement','1×5=5'],['Fill in the blanks with appropriate words','1×5=5'],['Writing answers of the questions from the text/dialogue (5 short questions, all)','5'],['Rearranging words to make meaningful sentences','2×5=10'],['Using capital letters and punctuation marks/Changing singular-plural forms/Using correct prepositions/articles','1×5=5'],['Using correct form of verbs in the sentences','2×5=10'],['Making Wh-Questions','2×5=10'],['Writing informal letter with or without clues','10'],['Writing a short composition with clues or without clues','10']],
+en5:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Five','','p'],['Multiple Choice Questions/Write True or False for each statement','1×5=5'],['Fill in the blanks with appropriate words from the box','1×5=5'],['Write the answer to the following questions (3 short questions)','1+2+2=5'],['Reading a text/dialogue (Q.4–5) — unseen','','p'],['Matching words with their meanings','1×5=5'],['Writing question answer in short (3 short questions)','1+2+2=5'],['Rearranging words to make meaningful sentences','2×5=10'],['Using capital letters and punctuation marks/Using correct prepositions/articles/Making Wh-Questions/appropriate form of adjectives','2×5=10'],['Complete the sentences with the correct form of verbs','1×5=5'],['Write a short composition with clues or without clues','10'],['Writing informal/formal letter or an email with or without clues','10']],
+co:[['বহুনির্বাচনি প্রশ্ন (১০টি, সবকয়টির উত্তর)','১০×১=১০'],['শূন্যস্থান পূরণ (৫টি, ৫টিরই উত্তর)','৫×১=৫'],['শুদ্ধ/অশুদ্ধ নির্বাচন (৫টি, ৫টিরই উত্তর)','৫×১=৫'],['মিলকরণ (৫টি; ডানপাশে ২টি অতিরিক্ত বিকল্প)','৫×১=৫'],['সংক্ষিপ্ত/অল্প কথায় উত্তর (৭টির মধ্যে ৫টি)','৫×৩=১৫'],['বর্ণনামূলক প্রশ্ন (৭টির মধ্যে ৫টি)','৫×৬=৩০']]};
+const M0=[['বহুনির্বাচনি প্রশ্ন (১০টি, সবকয়টির উত্তর; ৩টি গাণিতিক ধারণা, ৪টি প্রক্রিয়াগত ধারণা, ৩টি সমস্যা সমাধানমূলক)','১০'],['শূন্যস্থান পূরণ (৫টি, ৫টিরই উত্তর)','১০'],['সংক্ষিপ্ত উত্তর প্রশ্ন (১০টি, ১০টিরই উত্তর; ৩টি গাণিতিক ধারণা, ৪টি প্রক্রিয়াগত ধারণা, ৩টি সমস্যা সমাধানমূলক)','১০']],G=['জ্যামিতি (৩টি থেকে ২টি)','১০'];
+const MT={'3|1':[['যোগ করি (২টি, ২টিরই)','৬'],['যোগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['বিয়োগ করি (২টি, ২টিরই)','৬'],['বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['যোগ ও বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],G],
+'3|2':[['গুণ করি (২টি, ২টিরই)','৬'],['গুণ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['ভাগ করি (২টি, ২টিরই)','৬'],['ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['গুণ ও ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],G],
+'3|3':[['যোগ, বিয়োগ, গুণ ও ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৫'],['ভগ্নাংশের যোগ ও বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৫'],['বাংলাদেশি মুদ্রা সংক্রান্ত সমস্যা (২টি, ২টিরই)','৫'],['পরিমাপ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৫'],G,['উপাত্ত সংগ্রহ ও বিন্যস্তকরণ','১০']],
+'4|1':[['যোগ ও বিয়োগ করি (২টি)','৬'],['যোগ অথবা বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['যোগ-বিয়োগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['গুণ করি (২টি)','৬'],['গুণ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['জ্যামিতি (২টি)','১০']],
+'4|2':[['ভাগ (২টি)','৬'],['ভাগ সংক্রান্ত সমস্যা (৩টি থেকে ২টি)','১২'],['গুণিতক ও গুণনীয়ক (৩টি থেকে ২টি)','১২'],['জ্যামিতি (২টি)','১০']],
+'4|3':[['সাধারণ ভগ্নাংশ সংক্রান্ত সমস্যা','৬'],['দশমিক ভগ্নাংশ সংক্রান্ত সমস্যা','৬'],['পরিমাপ সংক্রান্ত সমস্যা (৩টি থেকে ২টি)','১২'],['জ্যামিতি (২টি)','১০'],['উপাত্ত','৬']],
+'5|1':[['গুণ ও ভাগ সংক্রান্ত সমস্যা (৩টি থেকে ২টি)','১২'],['যোগ, বিয়োগ, গুণ ও ভাগ সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['গুণিতক ও গুণনীয়ক (৩টি থেকে ২টি)','১২'],['জ্যামিতি (২টি)','১০']],
+'5|2':[['ভগ্নাংশের সমস্যা (৩টি থেকে ২টি)','১২'],['দশমিক ভগ্নাংশের সমস্যা (৩টি থেকে ২টি)','১২'],['শতকরা সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['জ্যামিতি (২টি)','১০']],
+'5|3':[['গড় সংক্রান্ত সমস্যা (৩টি থেকে ২টি)','১২'],['পরিমাপ সংক্রান্ত সমস্যা (৩টি থেকে ২টি)','১২'],['তথ্য ও উপাত্ত সংক্রান্ত সমস্যা (২টি থেকে ১টি)','৬'],['জ্যামিতি (২টি)','১০']]};
+const TP=(c,s,t)=>(s=='bn'?TPL['bn'+c]:s=='en'?TPL['en'+c]:s=='ma'?M0.concat(MT[c+'|'+t]):TPL.co).map(([t,m,p])=>({t,m,p:p?1:0,x:''}));
+const psl=()=>[['bn','বাংলা'],['en','ইংরেজি'],['ma','গণিত'],['sci','প্রাথমিক বিজ্ঞান'],['bgs','বাংলাদেশ ও বিশ্বপরিচয়']].concat(typeof RN!=='undefined'?Object.keys(RN).map(k=>['rel_'+k,RN[k]]):[]),
+pkey=()=>Z.cls+'|'+Z.sub+'|'+(Z.sub=='ma'?Z.tm:''),PS=()=>Z.P[pkey()]||(Z.P[pkey()]=TP(Z.cls,Z.sub,Z.tm));
+const sec=S=>{const N=nums(S);return S.map((x,i)=>`<div class="sb"><label>${x.p?'পাঠ্যাংশ':bn(N[i])+' নং প্রশ্ন'}</label><input value="${esc(x.t)}" oninput="QP.ps(${i},'t',this.value)">${x.p?'':`<label>নম্বর</label><input value="${esc(x.m)}" oninput="QP.ps(${i},'m',this.value)">`}<textarea rows="4" oninput="QP.ps(${i},'x',this.value)">${esc(x.x)}</textarea></div>`).join('')};
+function viewp(){const S=PS();return `<div class="card"><h3>প্রশ্নব্যাংক ও প্রশ্নপত্র</h3><div class="g"><div><label>ধরন</label><select onchange="QP.md(this.value)">${opts({m:'এমসিকিউ',c:'সৃজনশীল ও সংক্ষিপ্ত উত্তর',p:'প্রাথমিক (৩য়–৫ম) প্রশ্নপত্র'},Z.mode)}</select></div><div><label>শ্রেণি</label><select onchange="QP.cl(this.value)">${opts(CO(),Z.cls)}</select></div><div><label>বিষয়</label><select onchange="QP.sb(this.value)">${psl().map(([i,n])=>`<option value="${i}"${i==Z.sub?' selected':''}>${n}</option>`).join('')}</select></div>${Z.sub=='ma'?`<div><label>প্রান্তিক</label><select onchange="QP.tm(this.value)">${opts({1:'১ম প্রান্তিক',2:'২য় প্রান্তিক',3:'৩য় প্রান্তিক'},Z.tm)}</select></div>`:''}</div></div>
+<div class="card"><h3>প্রশ্ন লিখুন <small id="tot">${tt(S)}</small></h3><div id="tb">${TB}</div><div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>প্রিভিউ</small></div><small>প্রতিটি ঘরে সেই অংশের প্রশ্নগুলো লিখুন (প্রতি লাইনে একটি)। শিরোনাম ও নম্বর বদলানো যায়।</small><div id="fm">${sec(S)}</div></div>
+<div class="card"><h3>প্রশ্নপত্র তৈরি</h3><div class="g">${ci('e','পরীক্ষার নাম')}${ci('s','সিলেবাস লাইন')}${ci('t','সময় (ফাঁকা = ২ ঘণ্টা ৩০ মিনিট)')}${ci('m','পূর্ণমান (ফাঁকা = যোগফল)')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}${ci('l','বাঁ পাশের লেখা')}</div><p><button class="btn" onclick="QP.gen()">প্রশ্নপত্র তৈরি করুন</button> <button class="btn" onclick="print()">🖨 প্রিন্ট (লিগ্যাল)</button></p></div><div id="qo">${Z.o}</div>`}
+function genp(){const S=PS(),c=Z.cf,N=nums(S),sn=(psl().find(a=>a[0]==Z.sub)||['',''])[1],x={...c,sub:sn,m:c.m||tot(S),nb:1,t:c.t||'২ ঘণ্টা ৩০ মিনিট'},
+ h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\n/g,'<br>')}</div></div>`:`<div class="pr"><span><b>${bn(N[i])}।</b> ${F(q.t)}</span><b>${esc(q.m)}</b></div><div class="sx">${F(q.x).replace(/\n/g,'<br>')}</div>`).join('');
+ Z.o=`<div class="qs pb" style="--g:${+c.g||18}px">${hd(x,CL[Z.cls])}<hr><p class="qn">[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।]</p><div class="pr" style="font-weight:700"><span></span><span>নম্বর</span></div>${h}</div>`;
+ const qoEl = document.getElementById('qo'); if(qoEl) qoEl.innerHTML=Z.o;}
 
-const TPL_PRI={
-  bn:[
-    ['১. বহু নির্বাচন/সংক্ষিপ্ত প্রশ্ন (১০টি)', '১০×১=১০', 0],
-    ['২. সঠিক শব্দ দিয়ে শূন্যস্থান পূরণ (৫টি)', '৫×১=৫', 0],
-    ['৩. বামপাশের বাক্যাংশের সাথে ডানপাশের বাক্যাংশ মিলকরণ', '৫×১=৫', 0],
-    ['৪. সংক্ষিপ্ত প্রশ্ন (৫টি)', '৫×২=১০', 0],
-    ['৫. যুক্তবর্ণ ভেঙে শব্দ তৈরি ও বাক্যে প্রয়োগ (৫টি)', '৫×২=১০', 0],
-    ['৬. শব্দার্থ লিখন (৫টি)', '৫×১=৫', 0],
-    ['৭. বিরামচিহ্ন বসিয়ে পুনরায় লেখা', '১×৫=৫', 0],
-    ['৮. কবিতার মূলভাব / অনুচ্ছেদ লিখন', '১×১০=১০', 0],
-    ['৯. ফরম পূরণ / আবেদনপত্র', '১×১০=১০', 0],
-    ['১০. রচনা লিখন (৩টির মধ্যে ১টি)', '১×১৫=১৫', 0]
-  ],
-  en:[
-    ['1. Multiple Choice Questions (10 Items)', '10×1=10', 0],
-    ['2. Fill in the blanks with correct words (5 Items)', '5×1=5', 0],
-    ['3. Match items in Column A with Column B', '5×1=5', 0],
-    ['4. Short Questions (5 Items)', '5×2=10', 0],
-    ['5. Rearrange words to make correct sentences (5 Items)', '5×2=10', 0],
-    ['6. Make Wh-questions / Use of Punctuation & Capital letters', '5×2=10', 0],
-    ['7. Read the text and answer short questions', '10', 0],
-    ['8. Write a short composition / Guided paragraph', '10', 0],
-    ['9. Form completion / Letter writing', '10', 0],
-    ['10. Story writing / Creative writing', '10', 0]
-  ],
-  ma:[
-    ['১. বহুনির্বাচনি প্রশ্ন (১০টি)', '১০×১=১০', 0],
-    ['২. সংক্ষিপ্ত উত্তর প্রশ্ন (১০টি)', '১০×২=২০', 0],
-    ['৩. যোগ / বিয়োগ / গুণ / ভাগ সংক্রান্ত গাণিতিক সমস্যা (২টি প্রশ্ন - অথবা সহ)', '১০', 0],
-    ['৪. সাধারণ ও দশমিক ভগ্নাংশ / শতকরা সংক্রান্ত গাণিতিক সমস্যা (২টি প্রশ্ন - অথবা সহ)', '১০', 0],
-    ['৫. পরিমাপ ও সময় সংক্রান্ত গাণিতিক সমস্যা (২টি প্রশ্ন - অথবা সহ)', '১০', 0],
-    ['৬. জ্যামিতিক চিত্র অঙ্কন ও বৈশিষ্ট্য লিখন', '১০', 0],
-    ['৭. তথ্য ও উপাত্ত সংক্রান্ত সমস্যা', '১০', 0],
-    ['৮. যোগ্যতাভিত্তিক সৃজনশীল প্রশ্ন (২টি প্রশ্ন - অথবা সহ)', '২০', 0]
-  ],
-  co:[
-    ['১. বহুনির্বাচনি প্রশ্ন (১০টি)', '১০×১=১০', 0],
-    ['২. শূন্যস্থান পূরণ (৫টি)', '৫×১=৫', 0],
-    ['৩. বাম-ডান কলাম মিলকরণ (৫টি)', '৫×১=৫', 0],
-    ['৪. সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)', '৫×২=১০', 0],
-    ['৫. বর্ণনামূলক/কাঠামোবদ্ধ প্রশ্ন (৭টির মধ্যে ৫টি)', '৫×৬=৩০']
-  ]
-};
+function view(){if(Z.mode=='p')return viewp();const ss=sl(Z.cls);if(!Z.sub)Z.sub=ss[0][0];
+ return `<div class="card"><h3>প্রশ্নব্যাংক ও প্রশ্নপত্র</h3><div class="g"><div><label>ধরন</label><select onchange="QP.md(this.value)">${opts({m:'এমসিকিউ',c:'সৃজনশীল ও সংক্ষিপ্ত উত্তর',p:'প্রাথমিক (৩য়–৫ম) প্রশ্নপত্র'},Z.mode)}</select></div></div><div class="g"><div><label>শ্রেণি</label><select onchange="QP.cl(this.value)">${opts(CO(),Z.cls)}</select></div><div><label>বিষয়</label><select onchange="QP.sb(this.value)">${ss.map(([i,n])=>`<option value="${i}"${i==Z.sub?' selected':''}>${n}</option>`).join('')}</select></div></div></div>
+<div class="card"><h3>নতুন প্রশ্ন</h3><label>ধরন</label><select onchange="QP.kd(this.value)">${opts(Z.mode=='c'?{c:'সৃজনশীল (উদ্দীপক + ক–ঘ)',s:'সংক্ষিপ্ত উত্তর'}:{g:'সাধারণ বহুনির্বাচনি',p:'বহুপদী সমাপ্তিসূচক',u:'উদ্দীপকভিত্তিক'},Z.k)}</select><div id="tb">${TB}</div><div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>প্রিভিউ</small></div><div id="fm">${fm()}</div></div>
+<div class="card" style="${Z.mode=='c'?'display:none':''}"><details><summary><b>টেক্সট থেকে একসাথে ইম্পোর্ট</b></summary><p><small>প্রতি প্রশ্ন: "১। প্রশ্ন" লাইনের পর "ক. … খ. … গ. … ঘ. …" লাইন। বহুপদীতে "i. …" লাইন যোগ করুন। উদ্দীপকের আগে "নিচের উদ্দীপকটি পড়ে ২৮ ও ২৯ নং প্রশ্নের উত্তর দাও:" লাইন, তার পরের লাইনে উদ্দীপক।</small></p><textarea id="imt" rows="6"></textarea><input id="imsrc" placeholder="উৎস, যেমন ঢাকা বোর্ড ২০২৫"><p><button class="btn" onclick="QP.imp()">ইম্পোর্ট</button></p></details></div>
+<div class="card"><h3>ব্যাংকের প্রশ্ন (${bn(ML().length)})</h3>${ML().map(row).join('')||'<small>এই শ্রেণি ও বিষয়ে এখনো প্রশ্ন নেই</small>'}</div>
+<div class="card"><h3>প্রশ্নপত্র তৈরি <small>(<span id="pc">${bn(qn())}</span>টি প্রশ্ন বাছাই)</small></h3><div class="g">${ci('e','পরীক্ষার নাম')}${ci('s','সিলেবাস লাইন')}${ci('t','সময় (ফাঁকা = নম্বর অনুযায়ী মিনিট)')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}${Z.mode=='c'?ci('na','সংক্ষিপ্ত: কয়টির উত্তর')+ci('nc','সৃজনশীল: কয়টির উত্তর')+ci('n','দ্রষ্টব্য লাইন (ফাঁকা = নিজে)'):''}${ci('m','পূর্ণমান (ফাঁকা = প্রশ্নসংখ্যা)')}${ci('c','বিষয় কোড (ফাঁকা = নিজে)')}${ci('l','বাঁ পাশের লেখা')}</div><p><button class="btn" onclick="QP.gen()">${Z.mode=='c'?'প্রশ্নপত্র তৈরি করুন':'৪ সেট তৈরি করুন'}</button> <button class="btn" onclick="print()">🖨 প্রশ্নপত্র প্রিন্ট (লিগ্যাল)</button> <button class="btn" onclick="QP.pkey()">উত্তরমালা প্রিন্ট</button></p></div><div id="qo">${Z.o}</div>`}
 
-const TP=(c,s)=>(s=='bn'?TPL_PRI.bn:s=='en'?TPL_PRI.en:s=='ma'?TPL_PRI.ma:TPL_PRI.co).map(([t,m,p])=>({t,m,p:p?1:0,x:''}));
-const psl=()=>[['bn','বাংলা'],['en','English'],['ma','গণিত'],['sci','প্রাথমিক বিজ্ঞান'],['bgs','বাংলাদেশ ও বিশ্বপরিচয়']];
-const pkey=()=>Z.cls+'|'+Z.sub,PS=()=>Z.P[pkey()]||(Z.P[pkey()]=TP(Z.cls,Z.sub));
-
-const sec=S=>{
-  const N=nums(S);
-  return S.map((x,i)=>`
-    <div class="sb" style="background:#f9f9f9;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:4px;">
-      <label><b>${x.p?'পাঠ্যাংশ':bn(N[i])+' নং প্রশ্ন শিরোনাম'}</b></label>
-      <input value="${esc(x.t)}" oninput="QP.ps(${i},'t',this.value)">
-      ${x.p?'':`<label>নম্বর</label><input value="${esc(x.m)}" oninput="QP.ps(${i},'m',this.value)">`}
-      <label>প্রশ্নের বিস্তারিত / সাব-কোশ্চেন (অথবা থাকলে নিচে লিখুন):</label>
-      <textarea rows="3" placeholder="প্রশ্ন ১...&#10;অথবা&#10;প্রশ্ন ২..." oninput="QP.ps(${i},'x',this.value)">${esc(x.x)}</textarea>
-    </div>
-  `).join('');
-};
-
-function viewp(){
-  const S=PS();
-  return `<div class="card">
-    <h3>প্রাথমিক সেকশন (শ্রেণি ৩য়–৫ম) - প্রশ্ন তৈরি</h3>
-    <div class="g">
-      <div><label>ধরন</label><select onchange="QP.md(this.value)">${opts({p:'প্রাথমিক (৩য়–৫ম) প্রশ্নপত্র',m:'এমসিকিউ (হাইস্কুল)',c:'সৃজনশীল ও সংক্ষিপ্ত (হাইস্কুল)'},Z.mode)}</select></div>
-      <div><label>শ্রেণি</label><select onchange="QP.cl(this.value)">${opts(CO(),Z.cls)}</select></div>
-      <div><label>বিষয়</label><select onchange="QP.sb(this.value)">${psl().map(([i,n])=>`<option value="${i}"${i==Z.sub?' selected':''}>${n}</option>`).join('')}</select></div>
-    </div>
-  </div>
-  <div class="card">
-    <h3>প্রশ্ন কাঠামো ও এন্ট্রি <small id="tot">${tt(S)}</small></h3>
-    <div id="tb">${TB}</div>
-    <div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>লাইভ প্রিভিউ</small></div>
-    <div id="fm">${sec(S)}</div>
-  </div>
-  <div class="card">
-    <h3>প্রশ্নপত্র হেডার ও জেনারেট</h3>
-    <div class="g">${ci('e','পরীক্ষার নাম (যেমন: বার্ষিক মূল্যায়ন পরীক্ষা-২০২৬)')}${ci('s','বিদ্যালয় / প্রতিষ্ঠানের নাম')}${ci('t','সময় (যেমন: ২ ঘণ্টা ৩০ মিনিট)')}${ci('m','পূর্ণমান')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}</div>
-    <p><button class="btn" onclick="QP.gen()">প্রশ্নপত্র তৈরি করুন</button> <button class="btn" onclick="print()">🖨 প্রিন্ট (A4 Landscape)</button></p>
-  </div>
-  <div id="qo">${Z.o}</div>`;
-}
-
-function genp(){
-  const S=PS(),c=Z.cf,N=nums(S),sn=(psl().find(a=>a[0]==Z.sub)||['',''])[1],
-  x={...c,l:c.s||'প্রাথমিক বিদ্যালয়',sub:sn,m:c.m||tot(S),nb:1,t:c.t||'২ ঘণ্টা ৩০ মিনিট'},
-  h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\n/g,'<br>')}</div></div>`:`
-    <div class="pr"><span><b>${bn(N[i])}।</b> ${F(q.t)}</span><b>${esc(q.m)}</b></div>
-    <div class="sx" style="margin-left:20px;">
-      ${F(q.x).split('\n').map(line=>line.trim()==='অথবা'?`<div style="text-align:center;font-weight:bold;margin:6px 0;">অথবা</div>`:`<div>${line}</div>`).join('')}
-    </div>
-  `).join('');
-
-  Z.o=`<div class="qs pb" style="--g:${+c.g||18}px">
-    <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:12px;">
-      <h2 style="margin:0;font-size:22px;color:#000;">${esc(x.l)}</h2>
-      <h3 style="margin:4px 0;font-size:16px;">${esc(x.e)}</h3>
-      <div style="display:flex;justify-content:space-between;font-weight:bold;margin-top:6px;">
-        <span>শ্রেণি: ${CL[Z.cls]||Z.cls}</span>
-        <span>বিষয়: ${esc(x.sub)}</span>
-        <span>সময়: ${esc(x.t)}</span>
-        <span>পূর্ণমান: ${bn(x.m)}</span>
-      </div>
-    </div>
-    <p class="qn" style="font-weight:bold;">[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দিতে হবে।]</p>
-    ${h}
-  </div>`;
-  const qoEl = document.getElementById('qo');
-  if(qoEl) qoEl.innerHTML=Z.o;
-}
-
-function view(){
-  if(Z.mode=='p')return viewp();
-  const ss=sl(Z.cls);
-  if(!Z.sub)Z.sub=ss[0][0];
-  return `<div class="card">
-    <h3>প্রশ্নব্যাংক ও প্রশ্নপত্র মডিউল</h3>
-    <div class="g">
-      <div><label>ধরন</label><select onchange="QP.md(this.value)">${opts({m:'এমসিকিউ (বহুনির্বাচনি)',c:'সৃজনশীল ও সংক্ষিপ্ত উত্তর',p:'প্রাথমিক (৩য়–৫ম) প্রশ্নপত্র'},Z.mode)}</select></div>
-      <div><label>শ্রেণি</label><select onchange="QP.cl(this.value)">${opts(CO(),Z.cls)}</select></div>
-      <div><label>বিষয়</label><select onchange="QP.sb(this.value)">${ss.map(([i,n])=>`<option value="${i}"${i==Z.sub?' selected':''}>${n}</option>`).join('')}</select></div>
-    </div>
-  </div>
-  <div class="card">
-    <h3>নতুন প্রশ্ন যোগ করুন</h3>
-    <label>প্রশ্ন ধরন</label>
-    <select onchange="QP.kd(this.value)">${opts(Z.mode=='c'?{c:'সৃজনশীল (উদ্দীপক + ক–ঘ)',s:'সংক্ষিপ্ত উত্তর'}:{g:'সাধারণ বহুনির্বাচনি',p:'বহুপদী সমাপ্তিসূচক',u:'উদ্দীপকভিত্তিক'},Z.k)}</select>
-    <div id="tb">${TB}</div>
-    <div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>লাইভ প্রিভিউ</small></div>
-    <div id="fm">${fm()}</div>
-  </div>
-  <div class="card" style="${Z.mode=='c'?'display:none':''}">
-    <details><summary><b>টেক্সট থেকে একসাথে ইম্পোর্ট করুন</b></summary>
-      <p><small>ফরম্যাট: "১। প্রশ্ন" এর পর "ক. অপশন১  খ. অপশন২  গ. অপশন৩  ঘ. অপশন৪"</small></p>
-      <textarea id="imt" rows="5"></textarea>
-      <input id="imsrc" placeholder="উৎস (যেমন: ঢাকা বোর্ড ২০২৫)">
-      <p><button class="btn" onclick="QP.imp()">ইম্পোর্ট করুন</button></p>
-    </details>
-  </div>
-  <div class="card">
-    <h3>প্রশ্নব্যাংক তালিকা (${bn(ML().length)}টি প্রশ্ন সংরক্ষিত)</h3>
-    ${ML().map(row).join('')||'<small>এই শ্রেণি ও বিষয়ে কোনো প্রশ্ন পাওয়া যায়নি</small>'}
-  </div>
-  <div class="card">
-    <h3>প্রশ্নপত্র তৈরি <small>(<span id="pc">${bn(qn())}</span>টি বাছাইকৃত)</small></h3>
-    <div class="g">
-      ${ci('e','পরীক্ষার নাম')}
-      ${ci('s','সিলেবাস লাইন')}
-      ${ci('t','সময় (ফাঁকা = সময় স্বয়ংক্রিয়)')}
-      ${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}
-      ${Z.mode=='c'?ci('na','সংক্ষিপ্ত: কয়টির উত্তর')+ci('nc','সৃজনশীল: কয়টির উত্তর')+ci('n','দ্রষ্টব্য লাইন'):''}
-      ${ci('m','পূর্ণমান')}
-      ${ci('c','বিষয় কোড')}
-      ${ci('l','প্রতিষ্ঠান / স্কুলের নাম')}
-    </div>
-    <p>
-      <button class="btn" onclick="QP.gen()">${Z.mode=='c'?'প্রশ্নপত্র তৈরি করুন':'৪ সেট তৈরি করুন'}</button> 
-      <button class="btn" onclick="print()">🖨 প্রশ্নপত্র প্রিন্ট (A4 Landscape)</button> 
-      <button class="btn" onclick="QP.pkey()">উত্তরমালা প্রিন্ট</button>
-    </p>
-  </div>
-  <div id="qo">${Z.o}</div>`;
-}
-
-const css=document.createElement('style');
-css.textContent=`@font-face{font-family:NikoshBAN;src:local('NikoshBAN'),local('Nikosh'),url('NikoshBAN.ttf')}
-.qs{background:#fff;color:#111;font-family:NikoshBAN,'Noto Serif Bengali',serif;font-size:13px;line-height:1.5;padding:14px;max-width:900px;margin:0 auto 16px;border:1px solid #bbb;overflow-x:auto}
-.qh{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ql{flex:1;color:#d01010;font-weight:700;font-size:24px;line-height:1.1}.qm{flex:1.4;line-height:1.8;font-size:13px}.qb{flex:1.2;border:2px solid #111;padding:8px;font-weight:700;line-height:2.0}
-.bx{display:inline-block;border:1.5px solid #111;padding:0 6px;margin:0 2px;font-size:16px}.qs hr{border:0;border-top:2px solid #111;margin:12px 0}.qn{font-size:11px;text-align:justify}.qw{text-align:center}
-.cl{column-count:2;column-gap:24px;column-rule:1px solid #111}.q{break-inside:avoid;margin:var(--g,16px) 0}.pas{margin:12px 0;font-style:italic}.sx{margin:0 0 var(--g,16px) 22px}.ct{text-align:center;margin:14px 0 6px}.pr{display:flex;justify-content:space-between;gap:12px;margin:var(--g,16px) 0}.pr b{min-width:20px;text-align:right}.cq{margin:calc(var(--g,16px)*1.3) 0;break-inside:avoid}.si{margin-left:16px}.op{display:grid;grid-template-columns:1fr 1fr;margin-left:16px}.op1{grid-template-columns:1fr}
-.iso{display:inline-flex;flex-direction:column;vertical-align:middle;line-height:1;font-size:.8em;margin-right:1px}.iso sup,.iso sub{position:static;vertical-align:baseline;line-height:1.1;font-size:1em}.qs table{width:100%;border-collapse:collapse}.qs td,.qs th{border:1px solid #444;padding:4px;text-align:center}
-@media print{
-  @page { size: A4 landscape; margin: 8mm; }
-  body { background: #fff; }
-  .card, #nav, .btn, #tb, #pvw, details { display: none !important; }
-  .qs { border: 0; max-width: 100%; margin: 0; padding: 0; }
-  .cl { column-count: 2 !important; }
-}`;
+/* স্টাইল ও হুক */
+const css=document.createElement('style');css.textContent=`@font-face{font-family:NikoshBAN;src:local('NikoshBAN'),local('Nikosh'),url('NikoshBAN.ttf')}
+.qs{background:#fff;color:#111;font-family:NikoshBAN,'Noto Serif Bengali',serif;font-size:13px;line-height:1.5;padding:14px;max-width:820px;margin:0 auto 16px;border:1px solid #bbb;overflow-x:auto}
+.qh{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ql{flex:1;color:#d01010;font-weight:700;font-size:26px;line-height:1.1}.qm{flex:1.4;line-height:2.2;font-size:14px}.qb{flex:1.2;border:2px solid #111;padding:12px;font-weight:700;line-height:2.4}
+.bx{display:inline-block;border:1.5px solid #111;padding:0 7px;margin:0 2px;font-size:17px}.qs hr{border:0;border-top:2px solid #111;margin:16px 0}.qn{font-size:11px;text-align:justify}.qw{text-align:center}
+.cl{column-count:2;column-gap:26px;column-rule:1px solid #111}.q{break-inside:avoid;margin:var(--g,18px) 0}.pas{margin:12px 0;font-style:italic}.sx{margin:0 0 var(--g,18px) 22px}.ct{text-align:center;margin:16px 0 8px}.pr{display:flex;justify-content:space-between;gap:12px;margin:var(--g,18px) 0}.pr b{min-width:20px;text-align:right}.cq{margin:calc(var(--g,18px)*1.4) 0;break-inside:avoid}.si{margin-left:16px}.op{display:grid;grid-template-columns:1fr 1fr;margin-left:16px}.op1{grid-template-columns:1fr}
+.iso{display:inline-flex;flex-direction:column;vertical-align:middle;line-height:1;font-size:.8em;margin-right:1px}.iso sup,.iso sub{position:static;vertical-align:baseline;line-height:1.1;font-size:1em}.qs table{width:100%;border-collapse:collapse}.qs td,.qs th{border:1px solid #444;padding:3px;text-align:center}
+@media(max-width:600px){.cl{column-count:1}}@media print{.qk{display:none}body.pk .qs{display:none}body.pk .qk{display:block}.qs{border:0;max-width:none;margin:0;padding:0}.cl{column-count:2!important}@page{size:A4 landscape;margin:10mm}}`;
 document.head.appendChild(css);
 
-// অটোমেটিক নেভিগেশন ট্যাব ইনজেকশন
-function setupNavTab(){
-  const nav = document.getElementById('nav') || document.querySelector('nav') || document.querySelector('.nav');
-  if(nav && !document.getElementById('btn-qpaper-tab')){
-    const btn = document.createElement('button');
-    btn.id = 'btn-qpaper-tab';
-    btn.className = (typeof V !== 'undefined' && V.tab == 5) ? 'on' : '';
-    btn.textContent = 'প্রশ্নপত্র';
-    btn.onclick = function(){
-      if(typeof V !== 'undefined') V.tab = 5;
-      if(typeof render === 'function') render();
-      else {
-        const app = document.getElementById('app');
-        if(app) app.innerHTML = view();
-      }
+const pg=document.createElement('style');pg.textContent='@media print{@page{size:8.5in 14in;margin:10mm}}';document.head.appendChild(pg);pg.disabled=true;
+
+function ensureNavBtn(){
+  const nv=document.getElementById('nav')||document.querySelector('nav')||document.querySelector('.nav');
+  if(nv && !document.getElementById('btn-qpaper-tab')){
+    const btn=document.createElement('button');
+    btn.id='btn-qpaper-tab';
+    btn.textContent='প্রশ্নপত্র';
+    btn.onclick=function(e){
+      e.stopPropagation();
+      if(typeof V !== 'undefined') V.tab=5;
+      nv.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld();}
+      const app=document.getElementById('app');
+      if(app) app.innerHTML=view();
     };
-    nav.appendChild(btn);
+    nv.appendChild(btn);
   }
 }
 
-// রেন্ডার ফাংশন ও হুক
-const R0 = typeof window.render === 'function' ? window.render : null;
-window.render = function(){
+const R0=typeof window.render==='function'?window.render:null;
+window.render=function(){
+  const on=typeof V!=='undefined' && V.tab==5;
+  if(on) V.tab=0;
   if(R0) R0();
-  setupNavTab();
-  if(typeof V !== 'undefined' && V.tab == 5){
-    const app = document.getElementById('app');
-    if(app){
-      if(!Z.sub){ Z.sub = sl(Z.cls)[0][0]; ld(); }
-      app.innerHTML = view();
-    }
+  if(on) V.tab=5;
+  ensureNavBtn();
+  if(on){
+    if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld();}
+    const app=document.getElementById('app');
+    if(app) app.innerHTML=view();
   }
+  if(typeof pg!=='undefined') pg.disabled=!on;
 };
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  setupNavTab();
-  if(typeof V !== 'undefined' && V.tab == 5) window.render();
+  ensureNavBtn();
+  if(typeof V!=='undefined' && V.tab==5) window.render();
 });
 
+window.onafterprint=()=>document.body.classList.remove('pk');
 window.QP={
   md:v=>{Z.mode=v;Z.Q=[];Z.pk={};Z.o='';if(v=='p'){if(+Z.cls<3||+Z.cls>5)Z.cls='3';Z.sub='bn';draw();return}if(+Z.cls<6)Z.cls='9';Z.sub=sl(Z.cls)[0][0];Z.k=v=='c'?'c':'g';draw();ld()},
   tm:v=>{Z.tm=v;draw()},
@@ -503,13 +387,13 @@ window.QP={
   cf:Z.cf,
   ins,
   add,
-  edit: editQ,
+  edit:editQ,
   an,
   del,
   pk,
   imp,
   gen,
-  imgUp: handleImgUpload,
+  imgUp:handleImgUpload,
   cl:v=>{Z.cls=v;if(Z.mode=='p'){Z.sub='bn';draw();return}Z.sub=sl(v)[0][0];Z.Q=[];draw();ld()},
   sb:v=>{Z.sub=v;if(Z.mode=='p'){draw();return}Z.Q=[];draw();ld()},
   kd:v=>{Z.k=v;const fmEl=document.getElementById('fm');if(fmEl)fmEl.innerHTML=fm()},
