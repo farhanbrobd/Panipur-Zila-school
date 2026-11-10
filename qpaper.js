@@ -12,11 +12,11 @@ const DEFAULT_SUBS={
   '10':[['bn1','বাংলা প্রথম পত্র',100],['bn2','বাংলা দ্বিতীয় পত্র',100],['en1','ইংরেজি প্রথম পত্র',100],['en2','ইংরেজি দ্বিতীয় পত্র',100],['ma','সাধারণ গণিত',100],['acc','হিসাববিজ্ঞান',100],['phy','পদার্থবিজ্ঞান',100],['che','রসায়ন',100],['bio','জীববিজ্ঞান',100],['bgs','বাংলাদেশ ও বিশ্বপরিচয়',100]]
 };
 
-const sl=c=>{const r=[],K=Z.mode=='c'?'c':'m';
- try{if(typeof subs==='function'){subs(c,null).forEach(({s})=>{const p=(s.parts||[]).find(p=>p.k==K);if(p)s.id=='rel'?Object.keys(RN).forEach(k=>r.push(['rel_'+k,RN[k],p.m])):r.push([s.id,s.n,p.m])})}}catch(e){}
+const sl=c=>{const r=[];
+ try{if(typeof subs==='function'){subs(c,null).forEach(({s})=>{const p=(s.parts||[]).find(p=>p.k==(Z.mode=='c'?'c':'m'));if(p)s.id=='rel'?Object.keys(RN).forEach(k=>r.push(['rel_'+k,RN[k],p.m])):r.push([s.id,s.n,p.m])})}}catch(e){}
  let def=DEFAULT_SUBS[c]||[];
- def.forEach(item=>{if(!r.some(x=>x[0]==item[0]))r.push(item)});
- return r.filter(x=>{if(Z.mode=='m')return true;return true});
+ def.forEach(item=>{if(!r.some(x=>x[0]==item[0]))r.push([item[0],item[1],item[2]])});
+ return r;
 },cd=id=>id.startsWith('rel_')?RC[id.slice(4)]:(CODE[id]||'');
 
 const F=(s,a=/^(che|sci|bio|phy|agri|home)$/.test(Z.sub))=>{let r=esc(s).replace(/\^\{([^}]*)\}_\{([^}]*)\}/g,'<span class="iso"><sup>$1</sup><sub>$2</sub></span>').replace(/\^\{([^}]*)\}|\^(\S)/g,(m,x,y)=>'<sup>'+(x!=null?x:y).replace(/-/g,'−')+'</sup>').replace(/_\{([^}]*)\}|_([A-Za-z0-9])/g,(m,x,y)=>'<sub>'+(x!=null?x:y)+'</sub>');return a?r.replace(/([A-Za-z)\]])(\d+)/g,'$1<sub>$2</sub>'):r};
@@ -38,7 +38,7 @@ async function add(){if(Z.k=='c'||Z.k=='s')return addc();const k=Z.k,qs=[rd(1)].
  const it={id:'q'+Date.now(),cls:Z.cls,sub:Z.sub,kind:k,stim,qs,src:$('#src').value.trim(),ts:Date.now()};
  try{await DB.collection('qbank').doc(it.id).set(it);Z.Q.push(it);draw()}catch(e){alert('সংরক্ষণ হয়নি: '+e.message)}}
 const an=async(id,j,v)=>{const it=Z.Q.find(x=>x.id==id);it.qs[j].a=+v;try{await DB.collection('qbank').doc(id).update({qs:it.qs})}catch(e){alert(e.message)}};
-const del=async id=>{if(!confirm('এই প্রশ্ন মুছবেন্দ্র?'))return;await DB.collection('qbank').doc(id).delete();Z.Q=Z.Q.filter(x=>x.id!=id);draw()};
+const del=async id=>{if(!confirm('এই প্রশ্ন মুছবেন?'))return;await DB.collection('qbank').doc(id).delete();Z.Q=Z.Q.filter(x=>x.id!=id);draw()};
 const pk=(id,v)=>{Z.pk[id]=v;$('#pc').textContent=bn(qn())};
 /* টেক্সট ইম্পোর্ট */
 function parse(t){const L=t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),R=[];let G=null,need=0,exp=0,q=null,m;
@@ -48,7 +48,7 @@ function parse(t){const L=t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),R=[]
   if(m=l.match(/^[০-৯0-9]+\s*[।.]\s*(.+)/)){q={q:m[1],st:[],o:[],a:-1};if(G){G.qs.push(q);if(G.qs.length>=need)G=null}else R.push({kind:'g',stim:'',qs:[q]});continue}
   if(!q)continue;
   if(/^i{1,3}\.\s/.test(l))q.st.push(...l.split(/\s+(?=i{1,3}\.\s)/).map(x=>x.replace(/^i{1,3}\.\s*/,'')));
-  else if(/^ຄ[.)]\s|^[কখগঘ][.)]\s/.test(l))q.o=l.split(/\s+(?=[কখগঘ][.)]\s)/).map(x=>x.replace(/^[কখগঘ][.)]\s*/,''));
+  else if(/^ক[.)]\s/.test(l))q.o=l.split(/\s+(?=[কখগঘ]\.\s)/).map(x=>x.replace(/^[কখগঘ][.)]\s*/,''));
   else if(!/^নিচের কোনটি সঠিক/.test(l))q.q+=' '+l}
  return R.filter(x=>x.qs.length&&x.qs.every(q=>{if(q.st.length&&!q.o.length)q.o=AUTO.slice();return q.o.length==4})).map(x=>{if(x.kind=='g'&&x.qs[0].st.length)x.kind='p';return x})}
 async function imp(){const its=parse($('#imt').value),src=$('#imsrc').value.trim()||'ইম্পোর্ট';if(!its.length)return alert('কোনো প্রশ্ন পড়া যায়নি। ফরম্যাট দেখুন।');if(its.length>400)return alert('একবারে সর্বোচ্চ ৪০০টি');
@@ -91,7 +91,7 @@ function genc(){
 const en=t=>String(t).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)),tot=S=>S.reduce((a,x)=>a+(x.p?0:(+en(String(x.m).split('=').pop())||0)),0),nums=S=>{let n=0;return S.map(x=>x.p?'':++n)},tt=S=>{const T=tot(S);return 'মোট '+bn(T)+(T!=70?' <b style="color:#c0392b">⚠ ৭০ হয়নি, নম্বর মিলিয়ে নিন</b>':'')};
 const BN=[['কবি ও কবিতার নামসহ কবিতা লেখা','১×৫=৫']],SH=['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)'],W='১×৫=৫';
 const TPL={
-bn3:[['কবি ও কবিতার নামসহ কবিতা লেখা',W],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৩×৫=১৫'],['রচনামূলক প্রশ্ন (৩টির মধ্যে ২টি)','৫×২=১০'],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন',W],['যুক্তবর্ণ ভেঙে লেখা ও শব্দ তৈরি করা (৭টির মধ্যে ৫টি)',W],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)',W],['বিরামচিহ্নের ব্যবহার/স্ত্রীবাচক/পুরুষবাচক শব্দ',W],['একই কথায় প্রকাশ/বিপরীত/সমার্থক শব্দ লেখা (৭টির মধ্যে ৫টি)',W],['ফরম পূরণ করা',W],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১০×১=10']],
+bn3:[['কবি ও কবিতার নামসহ কবিতা লেখা',W],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৩×৫=১৫'],['রচনামূলক প্রশ্ন (৩টির মধ্যে ২টি)','৫×২=১০'],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন',W],['যুক্তবর্ণ ভেঙে লেখা ও শব্দ তৈরি করা (৭টির মধ্যে ৫টি)',W],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)',W],['বিরামচিহ্নের ব্যবহার/স্ত্রীবাচক/পুরুষবাচক শব্দ',W],['একই কথায় প্রকাশ/বিপরীত/সমার্থক শব্দ লেখা (৭টির মধ্যে ৫টি)',W],['ফরম পূরণ করা',W],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১০×১=১০']],
 bn4:[['কবি ও কবিতার নামসহ কবিতা লেখা',W],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৫×২=১০'],['রচনামূলক প্রশ্ন (৪টির মধ্যে ৩টি)','৫×৩=১৫'],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)',W],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন',W],['বিপরীত শব্দ/সমার্থক শব্দ/ক্রিয়ার কাল (৭টির মধ্যে ৫টি)',W],['বিরামচিহ্নের ব্যবহার/একক কথায় প্রকাশ',W],['যুক্তবর্ণ ভেঙে শব্দ তৈরি ও শব্দ দিয়ে বাক্য তৈরি (৭টির মধ্যে ৫টি)',W],['কবিতার মূলভাব লিখন/ফরমপূরণ/বিজ্ঞপ্তি (১টি)',W],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১×১০=১০']],
 bn5:[['কবি ও কবিতার নামসহ কবিতা লেখা',W],['সংক্ষিপ্ত উত্তর প্রশ্ন (৭টির মধ্যে ৫টি)','৫×২=১০'],['রচনামূলক প্রশ্ন (৪টির মধ্যে ৩টি)','৫×৩=১৫'],['শব্দার্থ লেখা (৭টির মধ্যে ৫টি)',W],['শূন্যস্থান পূরণ/শব্দ দিয়ে বাক্য তৈরি/মিলকরণ/বহুনির্বাচনি প্রশ্ন',W],['বিপরীত শব্দ/সমার্থক শব্দ/ক্রিয়ার কাল/স্ত্রীবাচক ও পুরুষবাচক শব্দ/সাধু ও চলিত রূপ (৭টির মধ্যে ৫টি)',W],['বিরামচিহ্নের ব্যবহার/একক কথায় প্রকাশ/অনুচ্ছেদ থেকে প্রশ্ন তৈরি',W],['যুক্তবর্ণ ভেঙে শব্দ তৈরি ও শব্দ দিয়ে বাক্য তৈরি (৭টির মধ্যে ৫টি)',W],['গদ্য অনুচ্ছেদের/কবিতার মূলভাব লিখন/ফরমপূরণ/আবেদনপত্র/চিঠি লিখন (১টি)',W],['অনুচ্ছেদ/রচনা লেখা (৩টির মধ্যে ১টি)','১×১০=১০']],
 en3:[['Reading a text/dialogue (Q.1–3) — English for Today, Class Three','','p'],['Multiple Choice Questions/Identifying True or False for each statement','1×5=5'],['Fill in the blanks with appropriate words from the box','1×5=5'],['Writing answers of the questions from the text/dialogue (5 short questions, all)','10'],['Matching words with their meanings','2×5=10'],['Writing the numbers in words/ordinal numbers','2×5=10'],['Rearranging words to make meaningful sentences','2×5=10'],['Using capital letters and punctuation marks/Changing singular-plural forms','1×5=5'],['Identifying noun, pronoun, verb/Making negative forms','1×5=5'],['Writing short composition with clues or without clues','10']],
