@@ -132,14 +132,28 @@ function gens(sp){const sel=Z.Q.filter(x=>Z.pk[x.id]);if(!sel.length)return aler
 const TF=t=>{const o=[];let r=[];const fl=()=>{if(r.length){o.push('<table class="ht">'+r.map((c,i)=>'<tr>'+c.map(x=>(i?'<td>':'<th>')+F(x)+(i?'</td>':'</th>')).join('')+'</tr>').join('')+'</table>');r=[]}};String(t||'').split('\n').forEach(l=>{if(l[0]=='#')r.push(l.slice(1).split('|').map(x=>x.trim()));else{fl();o.push(F(l)+'<br>')}});fl();return o.join('')};
 const tbl=()=>{const e=Z.last;if(!e)return alert('আগে একটি ঘরে ক্লিক করুন');const a=prompt('কলাম সংখ্যা, সারি সংখ্যা (যেমন 3,4) — প্রথম সারি শিরোনাম','3,4');if(!a)return;let [c,r]=a.split(/[,\s]+/).map(Number);c=Math.min(8,c||3);r=Math.min(20,r||4);const t=Array.from({length:r},(_,i)=>'#'+Array.from({length:c},(_,j)=>i?'':'শিরোনাম'+(j+1)).join(' | ')).join('\n')+'\n',p=e.selectionStart;e.value=e.value.slice(0,p)+(p&&e.value[p-1]!='\n'?'\n':'')+t+e.value.slice(e.selectionEnd);e.focus();e.dispatchEvent(new Event('input',{bubbles:true}))};
 const TBL='<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.tbl()">▦ ছক যোগ করুন</button>';
-function parseC(t,k){const R=[],pm=/^\(?([কখগঘ])[).]\s*(.*)$/,nm=/^[০-৯0-9]+\s*([।.)])\s*(.*)/;let cur=null,part=-1,m;
- t.split(/\r?\n/).map(x=>x.trim()).forEach(l=>{if(!l)return;
- if(k=='s'){if(m=l.match(nm))R.push({kind:'s',q:m[2]});else if(R.length)R[R.length-1].q+=' '+l;return}
-  if(m=l.match(nm)){cur={kind:k,stim:m[1],parts:[]};R.push(cur);part=-1;return}
-  if(!cur){cur={kind:k,stim:'',parts:[]};R.push(cur);part=-1}
+function parseC(t,k){
+ const R=[], pm=/^\(?([কখগঘ])[).]\s*(.*)$/, nm=/^[০-৯0-9]+\s*([।.)])\s*(.*)/; 
+ let cur=null, part=-1, m;
+ const lines = t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ 
+ const isShort = !lines.some(l => pm.test(l));
+ const actK = isShort ? 's' : k;
+
+ lines.forEach(l=>{
+  if(actK=='s'){
+   if(m=l.match(nm)){ R.push({kind:'s', q: m[2]}); }
+   else if(R.length){ R[R.length-1].q += ' ' + l; }
+   return;
+  }
+  if(m=l.match(nm)){cur={kind:actK,stim:m[2],parts:[]};R.push(cur);part=-1;return}
+  if(!cur){cur={kind:actK,stim:'',parts:[]};R.push(cur);part=-1}
   if(m=l.match(pm)){part=KS.indexOf(m[1]);cur.parts[part]=m[2];return}
   if(part>=0)cur.parts[part]+=' '+l;else cur.stim+=(cur.stim?'\n':'')+l});
- const N=k=='d'?2:CPM().length;return R.filter(x=>k=='s'?x.q:Array.from({length:N},(_,i)=>x.parts[i]).every(Boolean))}
+ 
+ const N=actK=='d'?2:CPM().length;
+ return R.filter(x=>actK=='s'?x.q:Array.from({length:N},(_,i)=>x.parts[i]).every(Boolean))
+}
 async function impc(){const k=Z.k;if(k=='x')return alert('লিখিত প্রশ্ন একটি একটি করে যোগ করুন');const its=parseC($('#imt').value,k),src=$('#imsrc').value.trim()||'ইম্পোর্ট',g=($('#igrp')||{}).value;if(!its.length)return alert('কোনো প্রশ্ন পড়া যায়নি। ফরম্যাট দেখুন।');if(its.length>400)return alert('একবারে সর্বোচ্চ ৪০০টি');
  const b=DB.batch(),T=Date.now();its.forEach((x,i)=>{Object.assign(x,{id:'q'+T+i,cls:Z.cls,sub:Z.sub,src,ts:T+i});if(g)x.grp=g;b.set(DB.collection('qbank').doc(x.id),x);Z.Q.push(x)});
  try{await b.commit();alert(bn(its.length)+'টি প্রশ্ন যোগ হয়েছে।');draw()}catch(e){alert('ইম্পোর্ট হয়নি: '+e.message)}}
