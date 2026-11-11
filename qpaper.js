@@ -132,9 +132,9 @@ function gens(sp){const sel=Z.Q.filter(x=>Z.pk[x.id]);if(!sel.length)return aler
 const TF=t=>{const o=[];let r=[];const fl=()=>{if(r.length){o.push('<table class="ht">'+r.map((c,i)=>'<tr>'+c.map(x=>(i?'<td>':'<th>')+F(x)+(i?'</td>':'</th>')).join('')+'</tr>').join('')+'</table>');r=[]}};String(t||'').split('\n').forEach(l=>{if(l[0]=='#')r.push(l.slice(1).split('|').map(x=>x.trim()));else{fl();o.push(F(l)+'<br>')}});fl();return o.join('')};
 const tbl=()=>{const e=Z.last;if(!e)return alert('আগে একটি ঘরে ক্লিক করুন');const a=prompt('কলাম সংখ্যা, সারি সংখ্যা (যেমন 3,4) — প্রথম সারি শিরোনাম','3,4');if(!a)return;let [c,r]=a.split(/[,\s]+/).map(Number);c=Math.min(8,c||3);r=Math.min(20,r||4);const t=Array.from({length:r},(_,i)=>'#'+Array.from({length:c},(_,j)=>i?'':'শিরোনাম'+(j+1)).join(' | ')).join('\n')+'\n',p=e.selectionStart;e.value=e.value.slice(0,p)+(p&&e.value[p-1]!='\n'?'\n':'')+t+e.value.slice(e.selectionEnd);e.focus();e.dispatchEvent(new Event('input',{bubbles:true}))};
 const TBL='<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.tbl()">▦ ছক যোগ করুন</button>';
-function parseC(t,k){const R=[],pm=/^\(?([কখগঘ])[).]\s*(.*)$/,nm=/^[০-৯0-9]+\s*[।.]\s*(.*)/;let cur=null,part=-1,m;
+function parseC(t,k){const R=[],pm=/^\(?([কখগঘ])[).]\s*(.*)$/,nm=/^[০-৯0-9]+\s*([।.)])\s*(.*)/;let cur=null,part=-1,m;
  t.split(/\r?\n/).map(x=>x.trim()).forEach(l=>{if(!l)return;
-  if(k=='s'){if(m=l.match(nm))R.push({kind:'s',q:m[1]});else if(R.length)R[R.length-1].q+=' '+l;return}
+ if(k=='s'){if(m=l.match(nm))R.push({kind:'s',q:m[2]});else if(R.length)R[R.length-1].q+=' '+l;return}
   if(m=l.match(nm)){cur={kind:k,stim:m[1],parts:[]};R.push(cur);part=-1;return}
   if(!cur){cur={kind:k,stim:'',parts:[]};R.push(cur);part=-1}
   if(m=l.match(pm)){part=KS.indexOf(m[1]);cur.parts[part]=m[2];return}
