@@ -161,4 +161,4 @@ function vSet(){return `<div class="card"><h3>সাধারণ সেটিং
 function render(){const T=['শিক্ষার্থী ও নম্বর','এডমিট কার্ড','ট্রান্সক্রিপ্ট','টিসি ও প্রত্যয়নপত্র','রুটিন ও সেটিংস'];$('#nav').innerHTML=T.map((t,i)=>`<button class="${V.tab==i?'on':''}" onclick="V.tab=${i};render()">${t}</button>`).join('');$('#app').innerHTML=[vStu,vAdm,vTr,vDoc,vSet][V.tab]()}
 if(/PASTE_/.test(JSON.stringify(firebaseConfig)))$('#app').innerHTML='<div class="card"><h3>⚠ Firebase কনফিগ বসানো হয়নি</h3><p>index.html-এর ৩০ নম্বর লাইনের PASTE_… লেখাগুলো নিজের Firebase কনফিগ দিয়ে বদলান।</p></div>';else{firebase.initializeApp(firebaseConfig);DB=firebase.firestore();AUTH=firebase.auth();
 AUTH.onAuthStateChanged(u=>{$('#lo').style.display=u?'':'none';if(u){$('#app').innerHTML='<div class="card">ডাটা লোড হচ্ছে…</div>';load().catch(e=>{$('#app').innerHTML='<div class="card"><h3>ডাটা আনা যায়নি</h3><p><b>'+esc(EH(e))+'</b></p><small>'+esc(e.code+': '+e.message)+'</small></div>'})}else showLogin()})}
-</script>: <script src="qpaper.js"></script></body></html>
+<script src="qpaper.js"></script></body></html>
