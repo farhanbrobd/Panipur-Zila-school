@@ -162,5 +162,5 @@ function render(){const T=['শিক্ষার্থী ও নম্বর',
 if(/PASTE_/.test(JSON.stringify(firebaseConfig)))$('#app').innerHTML='<div class="card"><h3>⚠ Firebase কনফিগ বসানো হয়নি</h3><p>index.html-এর ৩০ নম্বর লাইনের PASTE_… লেখাগুলো নিজের Firebase কনফিগ দিয়ে বদলান।</p></div>';else{firebase.initializeApp(firebaseConfig);DB=firebase.firestore();AUTH=firebase.auth();
 AUTH.onAuthStateChanged(u=>{$('#lo').style.display=u?'':'none';if(u){$('#app').innerHTML='<div class="card">ডাটা লোড হচ্ছে…</div>';load().catch(e=>{$('#app').innerHTML='<div class="card"><h3>ডাটা আনা যায়নি</h3><p><b>'+esc(EH(e))+'</b></p><small>'+esc(e.code+': '+e.message)+'</small></div>'})}else showLogin()})}
 </script>
-<script src="qpatch.js"></script>
+<script src="qpaper.js"></script>
 </body></html>
