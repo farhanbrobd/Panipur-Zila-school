@@ -97,10 +97,41 @@ const an=async(id,j,v)=>{const it=Z.Q.find(x=>x.id==id);it.qs[j].a=+v;try{await 
 const del=async id=>{if(!confirm('এই প্রশ্ন মুছবেন?'))return;await DB.collection('qbank').doc(id).delete();Z.Q=Z.Q.filter(x=>x.id!=id);draw()};
 const pk=(id,v)=>{Z.pk[id]=v;$('#pc').textContent=bn(qn())};
 const MC={frac:2,binom:2,C:2,P:2,sqrt:1,root:2,dot:1,rec:1,vec:1,bar:1};
-const mg=(s,i)=>{if(s[i]!='{')return null;let d=0;for(let j=i;j<s.length;j++){if(s[j]=='{')d++;else if(s[j]=='}'&&--d==0)return[s.slice(i+1,j),j+1]}return null};
-const mh=(c,a)=>{switch(c){case'frac':return`<span class="mxf"><span class="mxn">${a[0]}</span><span class="mxd">${a[1]}</span></span>`; case'binom':return`<span class="mxb"><span class="mxbp">(</span><span class="mxbs"><span>${a[0]}</span><span>${a[1]}</span></span><span class="mxbp">)</span></span>`; case'C':return`<sup>${a[0]}</sup>C<sub>${a[1]}</sub>`;case'P':return`<sup>${a[0]}</sup>P<sub>${a[1]}</sub>`; case'sqrt':return`<span class="mxs">√<span class="mxo">${a[0]}</span></span>`;case'root':return`<span class="mxs"><sup class="mxr">${a[0]}</sup>√<span class="mxo">${a[1]}</span></span>`; case'dot':return[...a[0]].map(x=>`<span class="mxdt">${x}</span>`).join(''); case'rec':{const L=[...a[0]];return L.map((x,i)=>i==0||i==L.length-1?`<span class="mxdt">${x}</span>`:x).join('')} case'vec':return`<span class="mxvc">${a[0]}</span>`;case'bar':return`<span class="mxbr">${a[0]}</span>`}return''};
-const mx=s=>{let o='',i=0;while(i<s.length){if(s[i]=='\\'){const m=s.slice(i+1).match(/^[A-Za-z]+/);if(m&&MC[m[0]]!=null){let j=i+1+m[0].length;const a=[];let ok=true;for(let k=0;k<MC[m[0]];k++){const g=mg(s,j);if(!g){ok=false;break}a.push(g[0]);j=g[1]}if(ok){o+=mh(m[0],a.map(mx));i=j;continue}}}o+=s[i++]}return o};
-const TBM=(()=>{const G=(t,L)=>`<div style="margin:3px 0"><small>${t}</small> `+L.map(([l,x])=>`<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" data-t="${esc(x==null?l:x)}" onclick="QP.ins(this.dataset.t)">${esc(l)}</button>`).join('')+'</div>', gk=[...'αβγδεζηθλμνξπρστφχψω'].map(x=>[x]),gk2=[...'ΓΔΘΛΞΠΣΦΨΩ'].map(x=>[x]),sy=[...'±∓×÷≠≈≡≤≥<>∞∴∵∠△⊥∥∈∉⊂⊆∪∩∅∑∫→⇒⇔°′″∝'].map(x=>[x]); return `<details open style="margin-top:6px"><summary><b>∑ গণিতের চিহ্ন ও সূত্র</b></summary><small>ঘরে ক্লিক করে বোতাম চাপুন। ভগ্নাংশ লেখা হয় \\frac{উপরে}{নিচে}</small>` +G('ভগ্নাংশ ও মূল',[['ভগ্নাংশ ▭/▭','\\frac{}{}'],['√','\\sqrt{}'],['ⁿ√','\\root{}{}']]) +G('পৌনঃপুনিক',[['০.৩̇ (এক অঙ্ক)','\\dot{}'],['০.১̇৪২৮৫̇ (চক্র)','\\rec{}']]) +G('কম্বিনেশন/দ্বিপদ',[['ⁿCᵣ','\\C{}{}'],['ⁿPᵣ','\\P{}{}'],['(ⁿᵣ) দ্বিপদ','\\binom{}{}']]) +G('গ্রিক (ছোট)',gk)+G('গ্রিক (বড়)',gk2)+G('চিহ্ন',sy) +G('ভেক্টর/গড়',[['→a ভেক্টর','\\vec{}'],['x̄ গড়/অধিরেখা','\\bar{}']])+'</details>'})();/* টেক্সট ইম্পোর্ট */
+const mg=(s,i)=>{if(!s||s[i]!='{')return null;let d=0;for(let j=i;j<s.length;j++){if(s[j]=='{')d++;else if(s[j]=='}'&&--d==0)return[s.slice(i+1,j),j+1]}return null};
+const mh=(c,a)=>{
+    switch(c){
+        case'frac':return`<span class="mxf"><span class="mxn">${a[0]}</span><span class="mxd">${a[1]}</span></span>`;
+        case'binom':return`<span class="mxb"><span class="mxbp">(</span><span class="mxbs"><span>${a[0]}</span><span>${a[1]}</span></span><span class="mxbp">)</span></span>`;
+        case'C':return`<sup>${a[0]}</sup>C<sub>${a[1]}</sub>`;
+        case'P':return`<sup>${a[0]}</sup>P<sub>${a[1]}</sub>`;
+        case'sqrt':return`<span class="mxs">√<span class="mxo">${a[0]}</span></span>`;
+        case'root':return`<span class="mxs"><sup class="mxr">${a[0]}</sup>√<span class="mxo">${a[1]}</span></span>`;
+        case'dot':return[...a[0]].map(x=>`<span class="mxdt">${x}</span>`).join('');
+        case'rec':{const L=[...a[0]];return L.map((x,i)=>i==0||i==L.length-1?`<span class="mxdt">${x}</span>`:x).join('')}
+        case'vec':return`<span class="mxvc">${a[0]}</span>`;
+        case'bar':return`<span class="mxbr">${a[0]}</span>`;
+    }
+    return '';
+};
+const mx=s=>{
+    if(!s||typeof s!=='string')return'';let o='',i=0;
+    while(i<s.length){
+        if(s[i]=='\\'){
+            const m=s.slice(i+1).match(/^[A-Za-z]+/);
+            if(m&&MC[m[0]]!=null){
+                let j=i+1+m[0].length;const a=[];let ok=true;
+                for(let k=0;k<MC[m[0]];k++){
+                    const g=mg(s,j);
+                    if(!g){ok=false;break}
+                    a.push(g[0]);j=g[1];
+                }
+                if(ok){o+=mh(m[0],a.map(mx));i=j;continue;}
+            }
+        }
+        o+=s[i++];
+    }
+    return o;
+};
 function parse(t){const L=t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),R=[];let G=null,need=0,exp=0,q=null,m;
  for(const l of L){
   if(/উদ্দীপক/.test(l)&&/উত্তর দাও\s*[:：]?$/.test(l)){need=(l.match(/[০-৯]+/g)||[]).length>1?2:1;exp=1;continue}
