@@ -81,13 +81,7 @@ const fill=it=>{const s=(i,v)=>{const e=$('#'+i);if(e)e.value=v==null?'':v},k=it
 const ed=id=>{const it=Z.Q.find(x=>x.id==id);if(!it)return;Z.ed=id;Z.edts=it.ts;if(it.kind=='x'){Z.xsec=it.sec;Z.xtx=null;Z.gd=it.grid?{c:it.grid.c,r:it.grid.r,h:!!it.grid.h,v:it.grid.v.map(x=>x.c.slice())}:null;Z.mqd=it.mq?JSON.parse(JSON.stringify(it.mq)):null}Z.k=it.kind;Z.img=it.img||'';draw();fill(it);const f=$('#fm');if(f)f.scrollIntoView({behavior:'smooth'})};
 const cx=()=>{Z.ed=null;Z.edts=0;Z.img='';Z.gd=Z.mqd=Z.xtx=null;draw()};
 const img=f=>{if(!f){Z.img='';const e=$('#ipv');if(e)e.innerHTML='';return}const r=new FileReader();r.onload=e=>{const i=new Image();i.onload=()=>{const k=Math.min(1,600/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);Z.img=c.toDataURL('image/jpeg',.75);const p=$('#ipv');if(p)p.innerHTML='<img src="'+Z.img+'" style="max-width:160px"> <button type="button" class="btn s r" onclick="QP.img(null)">ছবি সরান</button>'};i.src=e.target.result};r.readAsDataURL(f)};
-async function add(){if(Z.k=='x'){
-        const qText=$('#q_stim').value.trim();
-        if(!qText)return alert('প্রশ্ন বা অনুচ্ছেদের শিরোনাম লিখুন');
-        const it={id:Z.id||'q'+Date.now(),cls:Z.cls,sub:Z.sub,kind:'x',stim:qText,parts:[],src:$('#src').value||'ম্যানুয়াল',ts:Z.edts||Date.now()};
-        if(Z.img)it.img=Z.img;
-        await sv(it); return;
-    }if(Z.k=='c'||Z.k=='s')return addc();const k=Z.k,qs=[rd(1)].concat(k=='u'?[rd(2)]:[]).filter(x=>x.q).map(fx);
+async function add(){if('csdxf'.includes(Z.k))return addc();const k=Z.k,qs=[rd(1)].concat(k=='u'?[rd(2)]:[]).filter(x=>x.q).map(fx);
  if(!qs.length||qs.some(q=>q.o.some(o=>!o)))return alert('প্রশ্ন ও চারটি অপশন লিখুন');
  if(k=='p'&&!qs[0].st.length)return alert('i, ii, iii বিবৃতি লিখুন');
  const stim=k=='u'?$('#fst').value.trim():'';if(k=='u'&&!stim)return alert('উদ্দীপক লিখুন');
@@ -171,6 +165,8 @@ function gen(){if(Z.mode=='p')return genp();if(Z.mode=='c'){const sp=SPEC(Z.sub,
  Z.o=h+keyh(K);$('#qo').innerHTML=Z.o}
 /* সূত্রের বোতাম */
 const TB=[['নিচে ₂','_{}'],['উপরে ²','^{}'],['⁵⁶₂₆','^{}_{}'],['⁺','^{+}'],['⁻','^{-}'],['²⁺','^{2+}'],['²⁻','^{2-}'],['³⁺','^{3+}'],['³⁻','^{3-}'],['→','→'],['⇌','⇌'],['Δ','Δ'],['°','°'],['↑','↑'],['↓','↓'],['×','×'],['−','−']].map(([l,t])=>`<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.ins('${t}')">${l}</button>`).join('');
+/* গণিতের সূত্রের বোতাম (আগে ডিফাইন করা ছিল না, তাই ট্যাব খুলতে এরর হতো) */
+const TBM=[['ভগ্নাংশ','\\frac{}{}'],['√','\\sqrt{}'],['ⁿ√','\\root{}{}'],['ᶜC','\\C{}{}'],['ᶜP','\\P{}{}'],['binom','\\binom{}{}'],['ডট','\\dot{}'],['ভেক্টর','\\vec{}'],['বার','\\bar{}'],['π','π'],['θ','θ'],['α','α'],['β','β'],['≠','≠'],['≤','≤'],['≥','≥'],['∠','∠'],['△','△'],['∴','∴'],['÷','÷'],['±','±'],['∞','∞']].map(([l,t])=>`<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.ins('${t.replace(/\\/g,'\\\\')}')">${l}</button>`).join('');
 const ins=t=>{const e=Z.last;if(!e)return alert('আগে একটি ঘরে ক্লিক করুন');const s=e.selectionStart,v=e.value,c=t.indexOf('{'),p=c>=0&&t[c+1]=='}'?s+c+1:s+t.length;e.value=v.slice(0,s)+t+v.slice(e.selectionEnd);e.focus();e.setSelectionRange(p,p);e.dispatchEvent(new Event('input',{bubbles:true}))};
 document.addEventListener('focusin',e=>{if(e.target.closest&&e.target.closest('#fm'))Z.last=e.target});
 document.addEventListener('input',e=>{const t=e.target;if(t.closest&&t.closest('#fm')){Z.last=t;const p=$('#pvw');if(p)p.innerHTML=F(t.value)}});
@@ -255,7 +251,7 @@ const fmt=k=>{const e=Z.last;if(!e)return alert('আগে একটি ঘর�
 const TB2=`<button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.fmt('b')"><b>B</b> বোল্ড</button><button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.fmt('c')">মাঝ বরাবর</button><button type="button" class="btn s" style="margin:2px" onmousedown="event.preventDefault()" onclick="QP.fmt('v')">লম্বালম্বি (যোগ/গুণ)</button>`;
 const hdp=(x,c,s)=>`<div class="ph"><div class="p1">${esc(x.l)}</div><div class="p2">${esc(x.e)}</div><div class="p3"><span>শ্রেণি : ${esc(c)}</span><span>সময় : ${esc(x.t)}</span></div><div class="p3"><span>বিষয় : ${esc(s)}</span><span>পূর্ণমান : ${bn(x.m)}</span></div></div>`;
 function viewp(){const S=PS();return `<div class="card"><h3>প্রশ্নব্যাংক ও প্রশ্নপত্র</h3><div class="g"><div><label>ধরন</label><select onchange="QP.md(this.value)">${opts({m:'এমসিকিউ',c:'সৃজনশীল ও সংক্ষিপ্ত উত্তর',p:'প্রাথমিক (৩য়–৫ম) প্রশ্নপত্র'},Z.mode)}</select></div><div><label>শ্রেণি</label><select onchange="QP.cl(this.value)">${opts({3:'তৃতীয় শ্রেণি',4:'চতুর্থ শ্রেণি',5:'পঞ্চম শ্রেণি'},Z.cls)}</select></div><div><label>বিষয়</label><select onchange="QP.sb(this.value)">${psl().map(([i,n])=>`<option value="${i}"${i==Z.sub?' selected':''}>${n}</option>`).join('')}</select></div>${Z.sub=='ma'?`<div><label>প্রান্তিক</label><select onchange="QP.tm(this.value)">${opts({1:'১ম প্রান্তিক',2:'২য় প্রান্তিক',3:'৩য় প্রান্তিক'},Z.tm)}</select></div>`:''}</div></div>
-<div class="card"><h3>প্রশ্ন লিখুন <small id="tot">${tt(S)}</small></h3><div id="tb">${TB}${TBM}</div><div id="tb2">${TB2}</div><div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>প্রিভিউ</small></div><small>একাধিক আইটেম থাকলে ড্রপডাউন থেকে বাছুন; প্রতিটি প্রশ্নের জন্য আলাদা ঘর আসবে। লম্বালম্বি যোগ/গুণ: লাইনের শুরুতে | দিন।
+<div class="card"><h3>প্রশ্ন লিখুন <small id="tot">${tt(S)}</small></h3><div id="tb">${TB}${TBM}</div><div id="tb2">${TB2}</div><div id="pvw" class="qs" style="padding:6px;margin:6px 0;min-height:30px"><small>প্রিভিউ</small></div><small>একাধিক আইটেম থাকলে ড্রপডাউন থেকে বাছুন; প্রতিটি প্রশ্নের জন্য আলাদা ঘর আসবে। লম্বালম্বি যোগ/গুণ: লাইনের শুরুতে | দিন।</small><div id="fm">${sec(S)}</div></div>
 <div class="card"><h3>প্রশ্নপত্র তৈরি</h3><div class="g">${ci('l','স্কুলের নাম (হেডার)')}${ci('e','পরীক্ষার নাম')}${ci('t','সময় (ফাঁকা = ২ ঘণ্টা ৩০ মিনিট)')}${ci('m','পূর্ণমান (ফাঁকা = যোগফল)')}${ci('g','প্রশ্নের ফাঁক (১২–৪০)')}${ci('n','দ্রষ্টব্য (ফাঁকা = বাদ)')}</div><p><button class="btn" onclick="QP.gen()">প্রশ্নপত্র তৈরি করুন</button> <button class="btn" onclick="print()">🖨 প্রিন্ট (লিগ্যাল)</button></p></div><div id="qo">${Z.o}</div>`}
 function genp(){const S=PS(),c=Z.cf,N=nums(S),sn=(psl().find(a=>a[0]==Z.sub)||['',''])[1],x={...c,sub:sn,m:c.m||tot(S),nb:1,t:c.t||'২ ঘণ্টা ৩০ মিনিট'},cn=({3:'তৃতীয়',4:'চতুর্থ',5:'পঞ্চম'})[Z.cls]||Z.cls,
  h=S.map((q,i)=>q.p?`<div class="pas">${F(q.t)}<div>${F(q.x).replace(/\n/g,'<br>')}</div></div>`:`<div class="pr"><span><b>${bn(N[i])}।</b> ${F(dt(q))}</span><b>${esc(q.m)}</b></div>${body(q,pt(q.t))}`).join('');
@@ -284,7 +280,7 @@ const R0=render;
 window.render=function(){const on=V.tab==5;if(on)V.tab=0;R0();if(on)V.tab=5;const nv=$('#nav');
  if(on)nv.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
  nv.insertAdjacentHTML('beforeend',`<button class="${on?'on':''}" onclick="V.tab=5;render()">প্রশ্নপত্র</button>`);
- if(on){if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld()}$('#app').innerHTML=view()}pg.disabled=!on;pgs()};
+ if(on){try{if(!Z.sub){Z.sub=sl(Z.cls)[0][0];ld()}$('#app').innerHTML=view()}catch(e){console.error(e);$('#app').innerHTML='<div class="card"><h3>প্রশ্নপত্র ট্যাব লোড হয়নি</h3><p style="color:#c0392b">'+esc(String(e&&e.message||e))+'</p></div>'}}pg.disabled=!on;pgs()};
 window.onafterprint=()=>document.body.classList.remove('pk');
 window.QP={md:v=>{Z.gd=Z.mqd=Z.xtx=null;Z.xsec='';Z.mode=v;Z.Q=[];Z.pk={};Z.o='';if(v=='p'){if(+Z.cls<3||+Z.cls>5)Z.cls='3';Z.sub='bn';draw();ld();return}if(+Z.cls<6)Z.cls='9';Z.sub=sl(Z.cls)[0][0];Z.k=v=='c'?dk():'g';draw();ld()},tm:v=>{Z.tm=v;draw()},ps:(i,k,v)=>{PS()[i][k]=v;if(k=='m'){const e=$('#tot');if(e)e.innerHTML=tt(PS())}},
  sel:(i,v)=>{PS()[i].sel=+v;rf()},cnt:(i,v)=>{PS()[i].cnt=Math.max(1,Math.min(30,+v||1));rf()},ex:(i,v)=>{PS()[i].ex=Math.max(0,+v||0);rf()},il:(i,v)=>{PS()[i].il=v?1:0;rf()},
