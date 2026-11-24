@@ -366,4 +366,5 @@ if(/PASTE_/.test(JSON.stringify(firebaseConfig)))$('#app').innerHTML='<div class
 AUTH.onAuthStateChanged(u=>{$('#lo').style.display=u?'':'none';{const f=$('#fsv');if(f)f.style.display=u?'':'none'}ME=u;OWN=!!u&&OWNERS.includes((u.email||'').toLowerCase());{const me=$('#me');if(me)me.textContent=u?u.email+(OWN?'':' • নিজস্ব ডাটা'):''}if(u){$('#app').innerHTML='<div class="card">ডাটা লোড হচ্ছে…</div>';load().catch(e=>{$('#app').innerHTML='<div class="card"><h3>ডাটা আনা যায়নি</h3><p><b>'+esc(EH(e))+'</b></p><small>'+esc(e.code+': '+e.message)+'</small></div>'})}else showLogin()})}
 </script>
 <script src="qpaper.js"></script>
+<script src="publish.js"></script>
 </body></html>
